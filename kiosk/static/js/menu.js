@@ -774,7 +774,7 @@ let timer_id = null;
 // init()을 제외한 아래 세 개의 함수는 다음의 동작을 위한 것
 // 3분 간 아무런 동작이 없으며 홈화면으로 돌아감. 대신, 클릭 이벤트가 일어나면 기존의 타이머는 멈추고 클릭 이벤트 이후 새로운 타이머 작동
 function startTimer() {
-	timer_id = setTimeout("load('/')", 180000);
+	timer_id = setTimeout("load('/order')", 180000);
 }
 function cancleTimer() {
 	if (timer_id !== null) {

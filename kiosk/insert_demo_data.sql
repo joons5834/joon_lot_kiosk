@@ -365,8 +365,7 @@ INSERT INTO "MENU" VALUES (77,'우유','/static/img/menu/d_milk.png',1500,NULL,N
 
 INSERT INTO "MENU" VALUES (79,'오렌지주스(PET)','/static/img/menu/d_oragej.png',2500,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO "MENU" VALUES (80,'아이스티','/static/img/menu/d_icetea.png',2200,'달콤한 복숭아 맛의 시원한 아이스 드링크',0,310.0,160.0,0.0,0.0,0.0,0.0,39.0,0.0,NULL,0.0,'복숭아');
-
-
+INSERT INTO "MANAGER" VALUES (1, 'admin', '1234', '홍길동', '매니저'); 
 
 
 

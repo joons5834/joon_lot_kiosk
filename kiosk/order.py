@@ -78,10 +78,14 @@ def fetch_info():
     WHERE ID=?
     '''
     db = get_db()
+    rows = db.execute(sql_ingredients, (id,)).fetchall()
+    ingredients = []
+    for row in rows:
+        ingredients.append(row['name'])
+    row_desc = db.execute(sql_desc, (id,)).fetchone()
+    desc = row_desc['desc']
     db.row_factory = dict_factory
-    ingredients = db.execute(sql_ingredients, (id,)).fetchall()
-    desc = db.execute(sql_desc, (id,)).fetchall()
-    nutrients = db.execute(sql_nutrients, (id,)).fetchall()
+    nutrients = db.execute(sql_nutrients, (id,)).fetchone()
     print('ingredients:', ingredients)
     print('desc:', desc)
     print('nutrients', nutrients)

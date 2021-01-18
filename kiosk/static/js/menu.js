@@ -659,8 +659,7 @@ function menuShowdata(name, img, menu_id) {
 		contentType: "application/json",
 		success: function(data){
 			// alert('성공! 데이터 값');
-			console.log(data);
-			let desc_info = data['desc'][0]['DESC'];
+			let desc_info = data['desc'];
 			desc.innerHTML = desc_info;
 			$.each(data.ingredients, function(key,value){
 				// alert(key + " : " + value)

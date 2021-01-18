@@ -660,9 +660,13 @@ function menuShowdata(name, img, menu_id) {
 		success: function(data){
 			// alert('성공! 데이터 값');
 			let desc_info = data['desc'];
-			desc.innerHTML = desc_info;
-			$.each(data.ingredients, function(key,value){
-				// alert(key + " : " + value)
+			desc.innerText = desc_info;
+			let ingredients = data['ingredients']
+			for(const ingredient of ingredients){
+				ing_img.innerText += ingredient;
+			}
+			$.each(data.nutrients, function(key,value){
+				// alert(key + " : " + value);
 				// $('#div2').append('<div>'+ value.id + " " + value.password + " " + value.email  +'</div>')
 				// desc.innerHTML = 
 			})

@@ -612,45 +612,11 @@ function menuShowdata(name, img, menu_id) {
     </div>
 	`;
 	
-	const menu_data_bottom = document.querySelector(".menu_data_bottom");
-	const menu_data_btn = document.querySelector(".menu_data_btn");
-	// console.log(menu_data_btn);
-	menu_data_btn.onclick = function () {
-		menu_data_bottom.innerHTML = `
-		<STYLE TYPE="text/css">table {font-size: 10pt;}</STYLE>
-		<table border="1" bordercolor="black" width ="410" height="75" align = "center" >
-    <tr align = "center">
-		<td>원산지</td>
-		<td colspan="5" id=allergy_${menu_id}>명태연육-미국산, 새우-베트남산</td>
-    </tr>
-    <tr>
-		<td  align = "center">알러지</td>
-		<td colspan="5" align = "center">밀,대두,난류,우유,토마토,새우</td>
-
-    </tr>
-    <tr align = "center">
-		<td>총중량g</td>
-		<td>열량Kcal</td>
-		<td>단백질g(%)</td>
-		<td>나트륨mg(%)</td>
-		<td>당류g</td>
-		<td>포화지방g(%)</td>
-    </tr>
-    <tr align = "center" id=row_${menu_id}>
-		<td>179</td>
-		<td>492</td>
-		<td>15 (27)</td>
-		<td>810 (40)</td>
-		<td>7</td>
-		<td>4.7 (31)</td>
-	</tr>
-</table>
-		`;
-	};
+	
 	const fetch_info_path = ad_container.getAttribute("data-path_info");
 	let desc = document.getElementById(`desc_${menu_id}`);
 	let ing_img = document.getElementById(`ing_${menu_id}`);
-	let row = document.getElementById(`row_${menu_id}`);
+	// document.getElementById(`row_${menu_id}`);
 	$.ajax({
 		type: 'POST',
 		url: fetch_info_path,
@@ -659,18 +625,14 @@ function menuShowdata(name, img, menu_id) {
 		contentType: "application/json",
 		success: function(data){
 			// alert('성공! 데이터 값');
+			console.log(data)
 			let desc_info = data['desc'];
 			desc.innerText = desc_info;
 			let ingredients = data['ingredients']
 			for(const ingredient of ingredients){
 				ing_img.innerText += ingredient;
 			}
-			$.each(data.nutrients, function(key,value){
-				// alert(key + " : " + value);
-				// $('#div2').append('<div>'+ value.id + " " + value.password + " " + value.email  +'</div>')
-				// desc.innerHTML = 
-			})
-			
+			displayAllergyNutrient(data.allergy_info, data.nutrients);
 		},
 		error: function(request, status, error){
 			alert('ajax 통신 실패')
@@ -678,6 +640,41 @@ function menuShowdata(name, img, menu_id) {
 		}
 	})
 	
+}
+
+function displayAllergyNutrient(allergy_info, nutrients) {
+	const menu_data_btn = document.querySelector(".menu_data_btn");
+
+	menu_data_btn.addEventListener('click', function(e){
+		const menu_data_bottom = document.querySelector(".menu_data_bottom");
+		menu_data_bottom.innerHTML = `
+			<STYLE TYPE="text/css">table {font-size: 10pt;}</STYLE>
+			<table border="1" bordercolor="black" width ="410" height="75" align = "center" >
+			<tr align = "center">
+				<td>원산지</td>
+				<td colspan="6">명태연육-미국산, 새우-베트남산</td>
+			</tr>
+			<tr>
+				<td  align = "center">알러지</td>
+				<td colspan="6" align = "center" id="allergy">밀,대두,난류,우유,토마토,새우</td>
+			</tr>
+			<tr align = "center" id="nutrients_hd">
+			</tr>
+			<tr align = "center" id=nutrients_row>
+			</tr>
+		</table>
+				`;
+		let nutrients_hd = document.getElementById(`nutrients_hd`);
+		let nutrients_num = document.getElementById(`nutrients_row`);
+		let allergy = document.getElementById('allergy');
+		allergy.innerText = allergy_info;
+		for(const [key, value] of nutrients){
+			const newHd = nutrients_hd.insertCell(-1);
+			newHd.innerText = key;
+			const newNum = nutrients_num.insertCell(-1);
+			newNum.innerText = value;
+		}
+	}, false);
 }
 
 // 모달

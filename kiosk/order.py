@@ -9,6 +9,7 @@ from werkzeug.exceptions import abort
 from kiosk.db import get_db
 import datetime
 from itertools import groupby
+from collections import OrderedDict
 
 bp = Blueprint('order', __name__, url_prefix='/order')
 
@@ -74,28 +75,40 @@ def fetch_info():
         '''
     sql_desc = 'SELECT DESC FROM MENU WHERE ID=?'
     sql_nutrients = \
-        '''
-        SELECT WEIGHT_G, KCAL, PROTEIN_G, SODIUM_MG, SUGAR_G, SAT_FAT_G, CAFFEINE_MG
-        FROM MENU
-        WHERE ID=?
-        '''
+    '''
+    SELECT WEIGHT_G AS 총중량G, KCAL AS 열량Kcal, PROTEIN_G AS 단백질g, SODIUM_MG AS 나트륨mg, SUGAR_G AS 당류g, SAT_FAT_G AS 포화지방g
+    FROM MENU
+    WHERE ID=?
+    ''' # , CAFFEINE_MG AS 카페인mg
+    sql_allergy = '''
+    SELECT ALLERGY_INFO 
+    FROM MENU 
+    WHERE ID=?'''
     db = get_db()
+    rows = db.execute(sql_ingredients, (id,)).fetchall()
+    ingredients = []
+    for row in rows:
+        ingredients.append(row['name'])
+    row_desc = db.execute(sql_desc, (id,)).fetchone()
+    desc = row_desc['desc']
+    allergy_row = db.execute(sql_allergy, (id,)).fetchone()
+    allergy_info = allergy_row['ALLERGY_INFO']
+    if not allergy_info:
+        allergy_info = None
     db.row_factory = dict_factory
-    ingredients = db.execute(sql_ingredients, (id,)).fetchall()
-    desc = db.execute(sql_desc, (id,)).fetchall()
-    nutrients = db.execute(sql_nutrients, (id,)).fetchall()
+    nutrients = db.execute(sql_nutrients, (id,)).fetchone()
     print('ingredients:', ingredients)
     print('desc:', desc)
     print('nutrients', nutrients)
-    
-    return jsonify(ingredients=ingredients, desc=desc, nutrients=nutrients)
+    print('allergy_info:', allergy_info)
+    return jsonify(ingredients=ingredients, desc=desc, nutrients=nutrients, allergy_info=allergy_info)
 
 
 def dict_factory(cursor, row):
-    d = {}
+    d = OrderedDict()
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
-    return d    
+    return list(d.items())
     
     
 @bp.route('/charge')

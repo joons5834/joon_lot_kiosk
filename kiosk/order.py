@@ -10,6 +10,9 @@ from kiosk.db import get_db
 import datetime
 from itertools import groupby
 
+# from flask_socketio import emit, socketio
+from . import socketio
+
 bp = Blueprint('order', __name__, url_prefix='/order')
 
 @bp.route('/')
@@ -187,6 +190,7 @@ def register():
     db.executemany(insert_opt, insert_opt_list)
 
     db.execute('COMMIT')
+    socketio.emit('order complete', order_id)
     return render_template('order/order_num.html', order_id=order_id)
     
 

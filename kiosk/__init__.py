@@ -2,7 +2,9 @@ import os
 
 from flask import Flask, render_template
 from kiosk.db import get_db
+from flask_socketio import SocketIO
 
+socketio = SocketIO()
 
 def create_app(test_config=None):
     # create and configure the app
@@ -58,5 +60,6 @@ def create_app(test_config=None):
     from . import auth
     app.register_blueprint(auth.bp)
     
+    socketio.init_app(app)
     return app
     

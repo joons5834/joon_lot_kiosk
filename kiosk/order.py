@@ -11,6 +11,9 @@ import datetime
 from itertools import groupby
 from collections import OrderedDict
 
+# from flask_socketio import emit, socketio
+from . import socketio
+
 bp = Blueprint('order', __name__, url_prefix='/order')
 
 
@@ -200,6 +203,7 @@ def register():
     db.executemany(insert_opt, insert_opt_list)
 
     db.execute('COMMIT')
+    socketio.emit('order complete', order_id)
     return render_template('order/order_num.html', order_id=order_id)
     
 

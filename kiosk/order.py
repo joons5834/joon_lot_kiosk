@@ -10,6 +10,7 @@ from kiosk.db import get_db
 import datetime
 from itertools import groupby
 from collections import OrderedDict
+from contextlib import closing
 
 bp = Blueprint('order', __name__, url_prefix='/order')
 

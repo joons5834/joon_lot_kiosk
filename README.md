@@ -3,10 +3,10 @@
 ## 프로젝트 시작하기
 1. `Flask`를 [설치](https://flask.palletsprojects.com/en/1.1.x/installation/#installation)하신 후 
 1. 프로젝트의 루트 디렉토리에서
-   * 윈도우 CMD의 경우  
+   * 윈도우 PowerShell의 경우  
     ```
-    > set FLASK_APP=kiosk
-    > set FLASK_ENV=development
+    > $env:FLASK_APP = 'kiosk'
+    > $env:FLASK_ENV = 'development'
     > flask run
     ```
    * 리눅스 및 맥 터미널의 경우  
@@ -15,6 +15,12 @@
    $ export FLASK_ENV=development
    $ flask run
    ```
+   * 윈도우 CMD의 경우  
+    ```
+    > set FLASK_APP=kiosk
+    > set FLASK_ENV=development
+    > flask run
+    ```
     를 하시면
    ```
    * Serving Flask app "kiosk"

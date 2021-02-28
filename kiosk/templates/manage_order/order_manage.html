@@ -17,7 +17,7 @@
             <!-- stock_manage.html로 경로 설정 필요 -->
             <button onClick="location.href='{{ url_for('manage_order.stock') }}'" class="stock_btn">재고관리</button>
             <!-- auth.html 페이지로 경로 설정 필요 -->
-            <button onClick="location.href='{{ url_for('auth.index') }}'" class="manager_btn">
+            <button onClick="location.href='{{ url_for('auth.manager_btn') }}'" class="manager_btn">
                 <img src="{{ url_for('static', filename='img/settings.png') }}" alt="">
             </button>
         </div>

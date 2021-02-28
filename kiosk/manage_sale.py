@@ -9,8 +9,15 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from kiosk.db import get_db
+from kiosk.auth import login_required
 
 bp=Blueprint('manage_sale', __name__, url_prefix='/manage_sale')
+
+# Protect entire Blueprint with a login
+@bp.before_request
+@login_required
+def login_required_for_all_request():    
+    pass  
 
 @bp.route('/')
 def sale_btn():

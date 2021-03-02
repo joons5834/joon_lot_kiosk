@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manager Button</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/manager_btn.css')}}"> 
+    <title>Manager Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css')}}"> 
+    <script src="{{ url_for('static', filename='js/auth.js')}}" defer></script>
 </head>
 <body>
     <header>
-		<button onClick="window.history.back();" class="back_btn" >
+        <button onClick="location.href='#'" class="back_btn" >
             <img src="{{ url_for('static', filename='img/back.png')}}" alt="">
         </button>
         <div class="logo">롯데리아 - <span>관리자</span> [1/1]</div>
@@ -22,9 +23,12 @@
             <img src="{{ url_for('static', filename='img/lotteria2.png')}}" alt="">
         </div>
         <div class="container">
-           <div class="btn_container">
-               <button class="manage_menu_btn" onClick="location.href='{{ url_for('manage_menu.view_menu') }}'">메뉴 변동 관리</button>
-               <button class="manage_slae_btn" onClick="location.href='{{ url_for('manage_sale.sale_btn') }}'">매출 관리</button>
+           <div class="login_container">
+            <form method="post">
+                <input type="text" value="" id="username" name="username" class="id" placeholder="아이디" required>
+                <input type="password" value="" id="password" name="password" class="password" placeholder="비밀번호" required>
+                <input type="submit" value="등록" class="submit_btn">
+            </form>
            </div>
         </div>
 

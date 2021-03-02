@@ -20,7 +20,7 @@
             <button onClick="location.href='{{ url_for('manage_order.orders') }}'" class="stock_btn">주문확인</button>
             <!-- auth.html 경로설정 필요 -->
             <button class="manager_btn">
-                <img src="{{ url_for('static', filename='img/settings.png') }}" onClick="location.href='{{ url_for('auth.index') }}'" alt="">
+                <img src="{{ url_for('static', filename='img/settings.png') }}" onClick="location.href='{{ url_for('auth.manager_btn') }}'" alt="">
             </button>
         </div>
     </header>

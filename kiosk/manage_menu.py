@@ -70,8 +70,8 @@ def fetch_menu_by_category(menu_cat):
 def view_detail():
     db = get_db()
     #TODO: fetch menu's category
-    db.row_factory = dict_factory
-    c = db.cursor()
+    
+    
     # query=set_query(category_tag)
     # c.execute(query)
     # info = c.fetchall()
@@ -79,15 +79,23 @@ def view_detail():
         menu_id=request.get_json()
         # global original_name
         # original_name = menu_name
-        res = c.execute('SELECT ID, NAME, IMAGE_PATH, PRICE, DESC, \
+        c = db.cursor()
+        
+        categories = c.execute('''SELECT CATEGORY_TAG FROM MENU_CATEGORY
+                                WHERE MENU_ID = ?''',(menu_id,)).fetchall()
+        categories = tuple(row[0] for row in categories)
+        print(categories)
+        db.row_factory = dict_factory
+        res = db.execute('SELECT ID, NAME, IMAGE_PATH, PRICE, DESC, \
                         WEIGHT_G, KCAL, PROTEIN_G, PROTEIN_PCENT, SODIUM_MG, \
                         SODIUM_PCENT, SUGAR_G, SAT_FAT_G, SAT_FAT_PCENT, CAFFEINE_MG, \
                         ALLERGY_INFO \
                         FROM MENU WHERE ID=?',(menu_id,))
         menu_detail = res.fetchone()
+        
         db.close()
         print(menu_detail)
-        return json.dumps(menu_detail)
+        return jsonify(menu_detail=menu_detail, categories=categories)
 
 def dict_factory(cursor, row):
     d = {}

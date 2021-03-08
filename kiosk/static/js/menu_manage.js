@@ -70,11 +70,12 @@ function showMenuDetail(){
 }
 
 function fillFormWithDetail(data){ //TODO: fill image
-    for(let [key, value] of Object.entries(data)){
+    for(let [key, value] of Object.entries(data['menu_detail'])){
         const item = document.getElementById(key.toLowerCase())
         if (item)
             item.value = value;
     }
+    document.getElementById('category').value = data['categories']
 }
 
 //메뉴추가, 메뉴수정, 메뉴 삭제 버튼 클릭시 팝업창 내용 변경

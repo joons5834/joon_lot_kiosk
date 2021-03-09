@@ -90,6 +90,7 @@ function addMenubtn(){
           const action = event.target.dataset.path;
           const form = document.forms.manage_menu;
           const submit_btn = document.querySelector('.submit_btn');
+          const inputs = document.getElementsByTagName('input');
           if (filter==null){
               return;
           }
@@ -101,9 +102,15 @@ function addMenubtn(){
           event.target.classList.add("selected");
           if (filter==="add"){
               submit_btn.value = "추가";
+              for (const input of inputs){
+                input.readOnly = false;
+              }
           }
           else if(filter === "change"){
               submit_btn.value = "수정";
+              for (const input of inputs){
+                input.readOnly = false;
+              }
           } 
           else{
             //   submit_btn_container.innerHTML=`
@@ -111,6 +118,9 @@ function addMenubtn(){
             //   <input type="submit" value="삭제" class="submit_btn remove">
             //   `;
               submit_btn.value = "삭제";
+              for (const input of inputs){
+                  input.readOnly = true;
+              }
           }
           form.action = action;
         })

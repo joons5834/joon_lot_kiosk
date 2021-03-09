@@ -71,11 +71,16 @@ function showMenuDetail(){
     })
 }
 
-function fillFormWithDetail(data){ //TODO: fill image
+function fillFormWithDetail(data){
     for(let [key, value] of Object.entries(data['menu_detail'])){
         const item = document.getElementById(key.toLowerCase())
-        if (item)
-            item.value = value;
+        if (item) {
+            if (key === 'IMAGE_PATH') {
+                item.setAttribute('src', value)
+            } else{
+                item.value = value;
+            }
+        }
     }
     document.getElementById('category').value = data['categories']
 }
@@ -134,9 +139,8 @@ function setThumbnail(event) {
     for (var image of event.target.files) { 
         var reader = new FileReader(); 
         reader.onload = function(event) { 
-            var img = document.createElement("img"); 
+            const img = document.getElementById('image_path');
             img.setAttribute("src", event.target.result); 
-            document.querySelector("div#image_container").appendChild(img); 
         };
 
         console.log(image); 

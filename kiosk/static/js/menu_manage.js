@@ -8,6 +8,8 @@ form.addEventListener('submit', function(e){
     if (confirm(`${name}를(을) ${submit_btn.value}하시겠습니까?`) == true){
         form.submit();
     }else{
+        e.preventDefault();
+        alert(`${name} ${submit_btn.value} 취소되었습니다.`)
         return;
     }
 })

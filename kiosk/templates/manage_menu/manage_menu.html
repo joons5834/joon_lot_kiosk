@@ -101,24 +101,14 @@
                 </div>
 
                 <div class="categories_btn" data-path="{{ url_for('manage_menu.view_detail') }}">
-                    <!-- TODO: show menus via javascript -->
-                    <!-- <form name="view_menu_list" action="{{ url_for('add_menu.view_menu') }}" method="GET" > -->
 						<button class="category burger"  value="햄버거" data-filter="hamburger" name="burger"> 햄버거 </button>
 						<button class = "category dessert" value="디저트/치킨" data-filter="dessert" name="dessert"> 디저트/치킨 </button>
 						<button class="category drink" value="음료/커피" data-filter="drink" name="beverage"> 음료/커피 </button> 
-                    <!-- </form> -->
                 </div>
             </div>
             <div class="container_bottom">
                 <div class="menu_container">
                     <div class="menus">                        
-            	        <!-- {% for i in data %}
-						<button class="menu" name="view_name" value={{i[0]}} >
-							<div class="menu_name">{{ i[0] }}</div>
-                           	<div class="menu_price">{{ i[1] }}</div>
-						</button>
-                        {% endfor %} -->
-                        <!-- hamburger -->
                         {% for burger in burgers %}
                         <button class="menu" data-type="hamburger" data-id="{{ burger['id'] }}">
                                 <div class="menu_name">{{ burger['name'] }}</div>
@@ -126,7 +116,6 @@
                         </button>
                         {% endfor %}
                         
-                        <!-- drink -->
                         {% for drink in drinks %}
                         <button class="menu" data-type="drink" data-id="{{ drink['id'] }}">
                                 <div class="menu_name">{{ drink['name'] }}</div>
@@ -135,7 +124,6 @@
                         {% endfor %}
 
                         {% for dessert in desserts %}
-                        <!-- dessert -->
                         <button class="menu" data-type="dessert" data-id="{{ dessert['id'] }}">
                                 <div class="menu_name">{{ dessert['name'] }}</div>
                                 <div class="menu_price">{{ dessert['price'] }}</div>

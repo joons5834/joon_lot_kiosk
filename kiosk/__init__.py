@@ -39,15 +39,6 @@ def create_app(test_config=None):
     app.register_blueprint(order.bp)
     # app.add_url_rule('/', endpoint='index') # 필요한 코드??
 
-    from . import manage_menu_add
-    app.register_blueprint(manage_menu_add.bp)
-
-    from . import manage_menu_delete
-    app.register_blueprint(manage_menu_delete.bp)
-
-    from . import manage_menu_change
-    app.register_blueprint(manage_menu_change.bp)
-
     from . import manage_menu
     app.register_blueprint(manage_menu.bp)
     

@@ -1,15 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 	<meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title> Menu Management  </title>
+
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/menu_manage.css')}}">
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
 	<script src="{{ url_for('static', filename='js/menu_manage.js')}}" defer></script>
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flashes {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
     <header>
-        <button onClick="location.href='{{ url_for('auth.manager_btn') }}'" class="back_btn" >
+        <button onClick="location.href='{{ url_for('manage_menu.view_menu') }}'" class="back_btn" >
             <img src="{{ url_for('static', filename='img/back.png')}}" alt="">
         </button>
         <div class="logo">롯데리아 - <span>관리자</span> [1/1]</div>
@@ -26,29 +33,116 @@
             <div class="container_top">
                 <div class="container_manage">
                     <div class="menu_manage_btn">
-                        <button class="add_btn" onClick="location.href='{{ url_for('add_menu.view_menu') }}'">메뉴 추가</button>                      
-                        <button class="change_btn" onClick="location.href='{{ url_for('change_menu.view_menu') }}'">메뉴 수정</button>
-                        <button class="remove_btn" onClick="location.href='{{ url_for('delete_menu.view_menu') }}'">메뉴 삭제</button>
+                        <button class="add_btn" data-filter="add" data-path="{{url_for('manage_menu.add_menu') }}">메뉴 추가</button>                      
+                        <button class="change_btn" data-filter="change" data-path="{{url_for('manage_menu.change_menu') }}">메뉴 수정</button>
+                        <button class="remove_btn" data-filter="delete" data-path="{{url_for('manage_menu.delete_menu') }}">메뉴 삭제</button>
                     </div>
-                </div>            
-                <div class="categories_btn">
-                    <form name="view_menu_list" action="{{ url_for('manage_menu.view_menu') }}" method="GET" >
-						<button class="category burger"  value="햄버거"  name="burger"> 햄버거 </button>
+					<form class="container_describe" name = "manage_menu" method="POST" action="{{ url_for('manage_menu.add_menu') }}">			
+                    <div class="input_container">
+                    	<div class="container_display">
+
+                    		<div class="input_container_left">
+                    			<div id="image_container">
+                                    {% set no_image = url_for('static', filename='img/no_image.png') %}
+                                    <img id="image_path" src="{{ no_image }}" onerror="if (this.src != '{{ no_image }}') this.src = '{{ no_image }}';">
+                                </div>
+                                <input type="file" id ="image" accept="image/*" onchange="setThumbnail(event);" class="input_img" name="img">
+                             </div>
+                            <div class="input_container_middle">
+                                <div class="input_1">
+                                    <input id="id" name="id" type="hidden" value="">
+                                    <label for="mCategory">카테고리:</label>
+                                    <input id="category" name="category"  type="text" value="" required/><br>
+                                    <label for="mName">메뉴이름:</label>
+                                    <input id="name" name="name"  type="text" value="" required/><br>
+                                    <label for="mPrice">가격:</label>
+                                    <input id="price" name="price" type="number" value="" required/><br>
+                                </div>
+                                <div class="input_2">
+                                    <label for="mDesc">설명:</label>
+                                    <input id="desc" name="desc" type="text" value="" required/><br>
+                                </div>
+                                <div class="input_3">
+                                    <label for="mWeight">중량:</label>
+                                    <input id="weight_g" name="weight" type="number" value="" required/><br>
+                                    <label for="mKcal">열량:</label>
+                                    <input id="kcal" name="kcal" type="number" value="" required/><br>
+                                    <label for="mProteinG">단백질(g):</label>
+                                    <input id="protein_g" name="protein_g" type="number" value="" required/><br>
+                                    <label for="mProteinPct">단백질(%):</label>
+                                    <input id="protein_pcent" name="protein_pct" type="number" value="" required/><br>
+                                    <label for="mSodiumG">나트륨(g):</label>
+                                    <input id="sodium_mg" name="sodium_g" type="number" value="" required/><br>
+                                    <label for="mSodiumPct">나트륨(%):</label>
+                                    <input id="sodium_pcent" name="sodium_pct" type="number" value="" required/><br>
+                                </div>
+                                <div class="input_4">
+                                    <label for="mSugar">당:</label>
+                                    <input id="sugar_g" name="sugar" type="number" value="" required/><br>
+                                    <label for="mSatfatG">포화지방(g):</label>
+                                    <input id="sat_fat_g" name="satfat_g" type="number" value="" required/><br>	
+                                    <label for="mSatfatPct">포화지방(%):</label>
+                                    <input id="sat_fat_pcent" name="satfat_pct" type="number" value="" required/><br>
+                                    <label for="mCaff">카페인:</label>
+                                    <input id="caffeine_mg" name="caff" type="number" value="" required/><br>
+                                </div>
+                                <div class="input_5">
+                                    <label for="mAllergy">알러지정보:</label>
+                                    <input id="allergy_info" name="allergy"  type="text" value="" required/><br>
+                                </div>
+                            </div>
+                            <div class="input_container_right">
+                                <input type="submit" value="추가" class="submit_btn">
+                            </div> 
+                         </div>
+                    </div>
+                        
+                </form>
+                </div>
+
+                <div class="categories_btn" data-path="{{ url_for('manage_menu.view_detail') }}">
+                    <!-- TODO: show menus via javascript -->
+                    <!-- <form name="view_menu_list" action="{{ url_for('add_menu.view_menu') }}" method="GET" > -->
+						<button class="category burger"  value="햄버거" data-filter="hamburger" name="burger"> 햄버거 </button>
 						<button class = "category dessert" value="디저트/치킨" data-filter="dessert" name="dessert"> 디저트/치킨 </button>
 						<button class="category drink" value="음료/커피" data-filter="drink" name="beverage"> 음료/커피 </button> 
-                    </form>
+                    <!-- </form> -->
                 </div>
             </div>
             <div class="container_bottom">
                 <div class="menu_container">
-                    <div class="menus">
-                        {% for i in data %}
+                    <div class="menus">                        
+            	        <!-- {% for i in data %}
 						<button class="menu" name="view_name" value={{i[0]}} >
 							<div class="menu_name">{{ i[0] }}</div>
-                            <div class="menu_price">{{ i[1] }}</div>
+                           	<div class="menu_price">{{ i[1] }}</div>
 						</button>
+                        {% endfor %} -->
+                        <!-- hamburger -->
+                        {% for burger in burgers %}
+                        <button class="menu" data-type="hamburger" data-id="{{ burger['id'] }}">
+                                <div class="menu_name">{{ burger['name'] }}</div>
+                                <div class="menu_price">{{ burger['price'] }}</div>
+                        </button>
+                        {% endfor %}
+                        
+                        <!-- drink -->
+                        {% for drink in drinks %}
+                        <button class="menu" data-type="drink" data-id="{{ drink['id'] }}">
+                                <div class="menu_name">{{ drink['name'] }}</div>
+                                <div class="menu_price">{{ drink['price'] }}</div>
+                        </button>
+                        {% endfor %}
+
+                        {% for dessert in desserts %}
+                        <!-- dessert -->
+                        <button class="menu" data-type="dessert" data-id="{{ dessert['id'] }}">
+                                <div class="menu_name">{{ dessert['name'] }}</div>
+                                <div class="menu_price">{{ dessert['price'] }}</div>
+                        </button>
                         {% endfor %}
                     </div>
+                    
                 </div>
             </div>
         </div>

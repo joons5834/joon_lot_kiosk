@@ -1,6 +1,5 @@
 "use strict";
 
-//TODO: handle submit_btn for add, change, delete
 const form=document.manage_menu;
 form.addEventListener('submit', function(e){
     const name=form.name.value;

@@ -59,7 +59,7 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            return redirect(url_for('manage_sale.sale_btn'))
+            return render_template('/auth/manager_btn.html')
 
         flash(error)
 

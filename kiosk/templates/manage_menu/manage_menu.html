@@ -16,7 +16,7 @@
         {% endfor %}
     {% endwith %}
     <header>
-        <button onClick="location.href='{{ url_for('manage_menu.view_menu') }}'" class="back_btn" >
+        <button onClick="location.href='{{ url_for('auth.manager_btn') }}'" class="back_btn" >
             <img src="{{ url_for('static', filename='img/back.png')}}" alt="">
         </button>
         <div class="logo">롯데리아 - 

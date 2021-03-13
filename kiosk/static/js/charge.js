@@ -51,6 +51,7 @@ function clickStep1(){
         here_img.src = here_path; // /kiosk/static/img/here.png"; 
         togo_btn.style.opacity = 1;
         here_btn.style.opacity = 0.5;
+		localStorage.setItem('is_togo', true)
         clickStep2();
 
     }
@@ -60,6 +61,7 @@ function clickStep1(){
         togo_img.src = togo_path // "../img/togo.png";
         here_btn.style.opacity = 1;
         togo_btn.style.opacity = 0.5; 
+		localStorage.setItem('is_togo', false)
         clickStep2();
     }
 }
@@ -112,9 +114,9 @@ function getModal(){
 				$( btn ).click(function(){
 					let total = JSON.parse(localStorage.getItem('total'));
 					let items = JSON.parse(localStorage.getItem('item'));
-					
+					let is_togo = JSON.parse(localStorage.getItem('is_togo'));
 					let postdata = {
-						'total':total, 'items':items
+						'total':total, 'items':items, 'is_togo':is_togo
 					}
 					$.ajax({
 						type: 'POST',

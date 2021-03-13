@@ -16,11 +16,18 @@
         {% endfor %}
     {% endwith %}
     <header>
-        <button onClick="location.href='{{ url_for('manage_menu.view_menu') }}'" class="back_btn" >
+        <button onClick="location.href='{{ url_for('auth.manager_btn') }}'" class="back_btn" >
             <img src="{{ url_for('static', filename='img/back.png')}}" alt="">
         </button>
-        <div class="logo">롯데리아 - <span>관리자</span> [1/1]</div>
+        <div class="logo">롯데리아 - 
+            <span>관리자</span> 
+            {% if g.user %}
+            {{ g.user['LOGIN_ID'] }}
+            {% endif %}
+            [1/1]
+        </div>
         <div class="right_btn">
+            {% if g.user %}<button onClick="location.href='{{ url_for('auth.logout') }}'" class="stock_btn">로그아웃</button> {% endif %}
             <button onClick="location.href='{{ url_for('manage_order.orders') }}'" class="order_btn">주문확인</button>
             <button onClick="location.href='{{ url_for('manage_order.stock') }}'" class="stock_btn">재고관리</button>
         </div>

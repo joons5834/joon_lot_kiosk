@@ -137,74 +137,72 @@ def register():
         INSERT INTO ORDERS (STATUS, ORDERED_AT, RECEIPT_TOTAL, IS_TOGO)
         VALUES ( ?, ?, ?, ?)
         '''
-    with closing(db) as db:
-        order_id = db.execute(create_order, ('WAITING', now, receipt_total, is_togo)).lastrowid 
-        print('order id:', order_id)
-        
-        raw_list = []
-        insert_list = []
-        
-        # 형태 변환 전 1차 가공: ORDER_ITEM 테이블 구조에 맞는 형태로 입력을 변환한다.
-        for item in items:
-            print('name:', item['name'])
-            main_id = fetch_menu_id(item['name'])  # MAIN_DISH_ID를 구한다
-            main_dish_total = item['price']
-            item['options'] = []
-            if item['id'] == 'set':
-                options = []
-                dessert_id = fetch_menu_id(item['dessert'][0])
-                drink_id = fetch_menu_id(item['drink'][0])
-                options.append((dessert_id, 1, item['dessert'][1])) 
-                options.append((drink_id, 1, item['drink'][1]))
-                item['options'] += options
-                opt_total = item['dessert'][1] + item['drink'][1]
-                print('options:', options)
-            raw_list.append((order_id, main_id, item['amount'], main_dish_total, item['options']))
-        print('raw_list:', raw_list)
-        
-        # 2차 가공: 같은 MAIN_DISH끼리 묶어 QTY, OPTIONS를 합치고 item_no를 부여한다.
-        i = 1
-        insert_opt_list = []
-        raw_list = sorted(raw_list, key=lambda x: x[1])
-        for key, group in groupby(raw_list, lambda x: x[1]):
+    order_id = db.execute(create_order, ('WAITING', now, receipt_total, is_togo)).lastrowid 
+    print('order id:', order_id)
+    
+    raw_list = []
+    insert_list = []
+    
+    # 형태 변환 전 1차 가공: ORDER_ITEM 테이블 구조에 맞는 형태로 입력을 변환한다.
+    for item in items:
+        print('name:', item['name'])
+        main_id = fetch_menu_id(item['name'])  # MAIN_DISH_ID를 구한다
+        main_dish_total = item['price']
+        item['options'] = []
+        if item['id'] == 'set':
+            options = []
+            dessert_id = fetch_menu_id(item['dessert'][0])
+            drink_id = fetch_menu_id(item['drink'][0])
+            options.append((dessert_id, 1, item['dessert'][1])) 
+            options.append((drink_id, 1, item['drink'][1]))
+            item['options'] += options
+            opt_total = item['dessert'][1] + item['drink'][1]
+            print('options:', options)
+        raw_list.append((order_id, main_id, item['amount'], main_dish_total, item['options']))
+    print('raw_list:', raw_list)
+    
+    # 2차 가공: 같은 MAIN_DISH끼리 묶어 QTY, OPTIONS를 합치고 item_no를 부여한다.
+    i = 1
+    insert_opt_list = []
+    raw_list = sorted(raw_list, key=lambda x: x[1])
+    for key, group in groupby(raw_list, lambda x: x[1]):
+        group_list = list(group)
+        print('main_id_list:', [item[1] for item in group_list])
+        order_id = group_list[0][0]
+        item_no = i
+        main_id = key
+        qty = sum([item[2] for item in group_list])
+        main_dish_total = sum([item[3] for item in group_list])
+        raw_options = []
+        for item in group_list:
+            raw_options += item[4]
+        raw_options = sorted(raw_options, key=lambda x: x[0])
+        # OPT_CHOICE 테이블 구조에 맞는 형태로 입력을 변환한다.
+        for key, group in groupby(raw_options, lambda x: x[0]):
             group_list = list(group)
-            print('main_id_list:', [item[1] for item in group_list])
-            order_id = group_list[0][0]
-            item_no = i
-            main_id = key
-            qty = sum([item[2] for item in group_list])
-            main_dish_total = sum([item[3] for item in group_list])
-            raw_options = []
-            for item in group_list:
-                raw_options += item[4]
-            raw_options = sorted(raw_options, key=lambda x: x[0])
-            # OPT_CHOICE 테이블 구조에 맞는 형태로 입력을 변환한다.
-            for key, group in groupby(raw_options, lambda x: x[0]):
-                group_list = list(group)
-                print('option_group:', group_list)
-                option_id = group_list[0][0]
-                opt_qty = sum([item[1] for item in group_list])
-                opt_total = sum([item[2] for item in group_list])
-                insert_opt_list.append((order_id, item_no, option_id, opt_qty, opt_total))
-            insert_list.append((order_id, item_no, main_id, qty, main_dish_total))
-            i += 1
-        print('insert_list:', insert_list)
-        insert_main = \
-            '''
-            INSERT INTO ORDER_ITEM (ORDER_ID, ITEM_NO, MAIN_DISH_ID, QTY, MAIN_DISH_TOTAL)
-            VALUES ( ?, ?, ?, ?, ?)
-            '''
-        db.executemany(insert_main, insert_list)
-        
-        print('insert_opt_list:', insert_opt_list)
-        insert_opt = \
-            '''
-            INSERT INTO OPT_CHOICE (ORDER_ID, ITEM_NO, OPTION_ID, OPT_QTY, OPT_TOTAL)
-            VALUES (?, ?, ?, ?, ?)
-            '''
-        db.executemany(insert_opt, insert_opt_list)
+            print('option_group:', group_list)
+            option_id = group_list[0][0]
+            opt_qty = sum([item[1] for item in group_list])
+            opt_total = sum([item[2] for item in group_list])
+            insert_opt_list.append((order_id, item_no, option_id, opt_qty, opt_total))
+        insert_list.append((order_id, item_no, main_id, qty, main_dish_total))
+        i += 1
+    print('insert_list:', insert_list)
+    insert_main = \
+        '''
+        INSERT INTO ORDER_ITEM (ORDER_ID, ITEM_NO, MAIN_DISH_ID, QTY, MAIN_DISH_TOTAL)
+        VALUES ( ?, ?, ?, ?, ?)
+        '''
+    db.executemany(insert_main, insert_list)
+    print('insert_opt_list:', insert_opt_list)
+    insert_opt = \
+        '''
+        INSERT INTO OPT_CHOICE (ORDER_ID, ITEM_NO, OPTION_ID, OPT_QTY, OPT_TOTAL)
+        VALUES (?, ?, ?, ?, ?)
+        '''
+    db.executemany(insert_opt, insert_opt_list)
 
-        db.commit()
+    db.commit()
     socketio.emit('order complete', order_id)
     return render_template('order/order_num.html', order_id=order_id)
     

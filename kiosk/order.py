@@ -128,16 +128,17 @@ def register():
     # print(items, type(items))
     total = data['total']
     receipt_total = total['price']
+    is_togo = data['is_togo']
     db = get_db()
     # orders 테이블 반영-price 
     now = datetime.datetime.now().replace(microsecond=0)  # todo:wait_no, is togo, pay method
     create_order = \
         '''
-        INSERT INTO ORDERS (STATUS, ORDERED_AT, RECEIPT_TOTAL)
-        VALUES ( ?, ?, ?)
+        INSERT INTO ORDERS (STATUS, ORDERED_AT, RECEIPT_TOTAL, IS_TOGO)
+        VALUES ( ?, ?, ?, ?)
         '''
     with closing(db) as db:
-        order_id = db.execute(create_order, ('WAITING', now, receipt_total)).lastrowid 
+        order_id = db.execute(create_order, ('WAITING', now, receipt_total, is_togo)).lastrowid 
         print('order id:', order_id)
         
         raw_list = []

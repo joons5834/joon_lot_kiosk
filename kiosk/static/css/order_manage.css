@@ -147,10 +147,6 @@ button:hover {
   width: 100px;
   margin: 1px auto;
   border-radius: 5px;
-}
-
-.order_num,
-.order_time {
   display: flex;
   align-items: center;
   justify-content: center;

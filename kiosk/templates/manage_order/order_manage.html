@@ -41,7 +41,7 @@
 				<div class="container_mid">
 					<div class="order_num">{{ order['ID'] }}</div>
 					<div class="order_time">{{ order['ORDERED_AT'] }}</div>
-					<div class="is_togo">{{ order['IS_TOGO'] }}</div>
+					<div class="is_togo">{{ "포장" if order['IS_TOGO'] else "매장" }}</div>
 				</div>
 				<div class="container_menu">
 					<ul class="order_menu_list">

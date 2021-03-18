@@ -20,7 +20,7 @@ def orders():
     orders = []
     max_view = 8
     cols = 4
-    fetch_waiting = 'SELECT ID, WAIT_NO, strftime("%H:%M",ORDERED_AT) AS ORDERED_AT FROM ORDERS WHERE STATUS = "WAITING"'
+    fetch_waiting = 'SELECT ID, WAIT_NO, IS_TOGO, strftime("%H:%M",ORDERED_AT) AS ORDERED_AT FROM ORDERS WHERE STATUS = "WAITING"'
     cur_order.execute(fetch_waiting)
     wait_rows = cur_order.fetchmany(max_view)
     for row in wait_rows:

@@ -10,6 +10,8 @@ import datetime
 
 from kiosk.db import get_db
 
+from . import socketio
+
 bp = Blueprint('manage_order', __name__, url_prefix='/manage_order')
 
 @bp.route('/orders')
@@ -68,6 +70,7 @@ def call(id):
         '''
         db.execute(mark_done,(datetime.datetime.now().replace(microsecond=0), id))
         db.commit()
+        socketio.emit('cooking complete', id)
             
     return redirect(url_for('manage_order.orders'))
     

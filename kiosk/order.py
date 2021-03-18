@@ -210,4 +210,9 @@ def register():
 def fetch_menu_id(name):
     db = get_db()
     return db.execute('SELECT ID FROM MENU WHERE NAME=?', (name,)).fetchone()[0]
+
+
+@bp.route('/wait_panel')
+def wait_panel():
+    return render_template('/order/wait_panel.html')
     

@@ -11,7 +11,17 @@
 </head>
 
 <body>
-    조리 중:<ul id="cooking"></ul>
-    조리 완료:<ul id="done"></ul>
+    조리 중:
+    <ul id="cooking">
+        {% for order in waiting %}
+        <li id='{{ order["id"] }}'>{{ order["id"] }}</li>
+        {% endfor %}
+    </ul>
+    조리 완료:
+    <ul id="done">
+        {% for order in served %}
+        <li id='{{ order["id"] }}'>{{ order["id"] }}</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

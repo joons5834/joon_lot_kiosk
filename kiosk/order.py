@@ -210,4 +210,20 @@ def register():
 def fetch_menu_id(name):
     db = get_db()
     return db.execute('SELECT ID FROM MENU WHERE NAME=?', (name,)).fetchone()[0]
+
+
+@bp.route('/wait_panel')
+def wait_panel():
+    db = get_db()
+    LIST_LEN = 10
+    waiting_sql = "SELECT ID FROM ORDERS WHERE STATUS='WAITING'"
+    served_sql = '''
+        SELECT ID FROM ORDERS WHERE STATUS='SERVED'
+        ORDER BY SERVED_AT DESC
+        LIMIT ?
+    '''
+    waiting = db.execute(waiting_sql).fetchall()
+    served = db.execute(served_sql, (LIST_LEN,)).fetchall()
+
+    return render_template('/order/wait_panel.html', waiting=waiting, served=served)
     

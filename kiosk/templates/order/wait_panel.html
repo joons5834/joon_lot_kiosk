@@ -1,0 +1,27 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>wait_panel</title>
+  <meta name="description" content="wait_panel">
+  <meta name="author" content="SitePoint">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.1/socket.io.min.js" defer></script>
+  <script src="{{ url_for('static', filename='js/wait_panel.js') }}" defer></script>
+</head>
+
+<body>
+    조리 중:
+    <ul id="cooking">
+        {% for order in waiting %}
+        <li id='{{ order["id"] }}'>{{ order["id"] }}</li>
+        {% endfor %}
+    </ul>
+    조리 완료:
+    <ul id="done">
+        {% for order in served %}
+        <li id='{{ order["id"] }}'>{{ order["id"] }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

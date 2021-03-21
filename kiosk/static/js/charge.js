@@ -51,7 +51,7 @@ function clickStep1(){
         here_img.src = here_path; // /kiosk/static/img/here.png"; 
         togo_btn.style.opacity = 1;
         here_btn.style.opacity = 0.5;
-		localStorage.setItem('is_togo', true)
+		sessionStorage.setItem('is_togo', true)
         clickStep2();
 
     }
@@ -61,7 +61,7 @@ function clickStep1(){
         togo_img.src = togo_path // "../img/togo.png";
         here_btn.style.opacity = 1;
         togo_btn.style.opacity = 0.5; 
-		localStorage.setItem('is_togo', false)
+		sessionStorage.setItem('is_togo', false)
         clickStep2();
     }
 }
@@ -112,9 +112,9 @@ function getModal(){
 			const receipt_buttons = document.getElementsByClassName("receipt_btn");
 			for (const btn of receipt_buttons){
 				$( btn ).click(function(){
-					let total = JSON.parse(localStorage.getItem('total'));
-					let items = JSON.parse(localStorage.getItem('item'));
-					let is_togo = JSON.parse(localStorage.getItem('is_togo'));
+					let total = JSON.parse(sessionStorage.getItem('total'));
+					let items = JSON.parse(sessionStorage.getItem('item'));
+					let is_togo = JSON.parse(sessionStorage.getItem('is_togo'));
 					let postdata = {
 						'total':total, 'items':items, 'is_togo':is_togo
 					}
@@ -156,7 +156,7 @@ function handleCancleBtn() {
 	const btns = document.querySelector(".btns");
 	const order_cancle_btn = btns.querySelector(".order_cancle_btn");
 	order_cancle_btn.addEventListener("click", function () {
-		localStorage.clear();
+		sessionStorage.clear();
 	});
 }
 
@@ -226,7 +226,7 @@ function chargedPrice() {
 	const charge_last = document.querySelector(".charge_last");
 	const charge_last_money = charge_last.querySelector(".charge_last_money");
 
-	const total = localStorage.getItem("total");
+	const total = sessionStorage.getItem("total");
 	const parsedTotal = JSON.parse(total);
 	charge_money.innerHTML = `${numberWithCommas(parsedTotal.price)}`;
 	charge_last_money.innerHTML = `${numberWithCommas(parsedTotal.price)}`;
@@ -367,7 +367,7 @@ function makeList(item) {
 }
 
 function listsShowing() {
-	const itemsSelected = localStorage.getItem("item");
+	const itemsSelected = sessionStorage.getItem("item");
 	const parsedItemsSelected = JSON.parse(itemsSelected);
 	parsedItemsSelected.forEach(function (item) {
 		makeList(item);

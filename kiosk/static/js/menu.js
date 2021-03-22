@@ -55,7 +55,7 @@ function categorySelect() {
 
 // 로컬 스토리지에 선택한 메뉴 정보 업로드
 function saveItems() {
-	localStorage.setItem(ITEM, JSON.stringify(itemsSelected));
+	sessionStorage.setItem(ITEM, JSON.stringify(itemsSelected));
 	// 선택한 주문정보가 있다면 결제하기로 넘어갈 수 있음
 	if (itemsSelected.length !== 0) {
 		to_charge.setAttribute("onClick", `location.href='${charge_path}'`);
@@ -87,7 +87,7 @@ function saveTotal() {
 		amount: total_amount,
 		price: total_price,
 	};
-	localStorage.setItem(TOTAL, JSON.stringify(totalObj));
+	sessionStorage.setItem(TOTAL, JSON.stringify(totalObj));
 }
 
 // 세자리 마다 , 추가
@@ -101,7 +101,7 @@ function updateCheck() {
 
 	const total_amount_h1 = check_div.querySelector(".check_num");
 	const total_price_h1 = check_div.querySelector(".check_price");
-	const totals = localStorage.getItem(TOTAL);
+	const totals = sessionStorage.getItem(TOTAL);
 	if (totals !== null) {
 		const parsedTotals = JSON.parse(totals);
 		const amount_total = parsedTotals.amount;
@@ -150,7 +150,7 @@ function deleteItem(event) {
 		updateCheck();
 	} else {
 		itemsSelected = [];
-		localStorage.clear();
+		sessionStorage.clear();
 		updateCheck();
 		// 모두 삭제되고 선택된 주문 정보가 없다면 결제하기로 넘어갈 수 없음
 		to_charge.removeAttribute("onClick");
@@ -746,7 +746,7 @@ function getValueFromBtn(menu) {
 }
 // 결제 모듈에서 '이전'이나 '추가주문' 버튼을 눌러서 장바구니 선택 모듈로 돌아왔을 때
 function existingCart() {
-	const existing = localStorage.getItem("item");
+	const existing = sessionStorage.getItem("item");
 	if (existing !== null) {
 		const parsedExisting = JSON.parse(existing);
 		parsedExisting.forEach(function (parse) {

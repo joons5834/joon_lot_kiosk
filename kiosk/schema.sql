@@ -107,4 +107,13 @@ CREATE TABLE IF NOT EXISTS "INGREDIENT" (
 	"IMAGE_PATH"	TEXT,
 	PRIMARY KEY("ID")
 );
+DROP TRIGGER IF EXISTS update_ingredient_stock;
+CREATE TRIGGER update_ingredient_stock AFTER UPDATE OF STOCK ON INGREDIENT 
+BEGIN
+	SELECT CASE
+		WHEN ( new.STOCK < 0 )
+		THEN RAISE (ROLLBACK, 'Not enough stock!')
+	END;
+  -- TODO: update `is_soldout` for each relevant dish
+END;
 COMMIT;

@@ -114,6 +114,14 @@ BEGIN
 		WHEN ( new.STOCK < 0 )
 		THEN RAISE (ROLLBACK, 'Not enough stock!')
 	END;
-  -- TODO: update `is_soldout` for each relevant dish
+	UPDATE MENU
+	SET IS_SOLDOUT = CASE 
+						WHEN AMT > STOCK THEN 1
+										 ELSE 0
+					 END
+	FROM (select INGRD_ID, MENU_ID, AMT, STOCK
+	FROM INGREDIENT I JOIN INGRD_USE U ON I.ID = U.INGRD_ID 
+	WHERE INGRD_ID = new.ID) AS CONSUMED_BY
+	WHERE MENU.ID = CONSUMED_BY.MENU_ID ;
 END;
 COMMIT;

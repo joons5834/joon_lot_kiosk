@@ -208,7 +208,7 @@ def register():
         SET STOCK = STOCK - CONSUMPTION.AMT * ?
         FROM (SELECT INGRD_ID, AMT FROM INGRD_USE WHERE MENU_ID = ?) AS CONSUMPTION
         WHERE INGREDIENT.ID = CONSUMPTION.INGRD_ID;
-        ''' # TODO: update `is_soldout` for each affected dish
+        ''' # TODO: user-friendly soldout message
     db.executemany(ingredients_consumption, qty_list)
 
     db.commit()

@@ -201,6 +201,15 @@ def register():
         VALUES (?, ?, ?, ?, ?)
         '''
     db.executemany(insert_opt, insert_opt_list)
+    qty_list = [e[2:4][::-1] for e in insert_list] + [e[2:4][::-1] for e in insert_opt_list]
+    print(qty_list)
+    ingredients_consumption = '''
+        UPDATE INGREDIENT
+        SET STOCK = STOCK - CONSUMPTION.AMT * ?
+        FROM (SELECT INGRD_ID, AMT FROM INGRD_USE WHERE MENU_ID = ?) AS CONSUMPTION
+        WHERE INGREDIENT.ID = CONSUMPTION.INGRD_ID;
+        ''' # TODO: user-friendly soldout message
+    db.executemany(ingredients_consumption, qty_list)
 
     db.commit()
     socketio.emit('order complete', order_id)

@@ -128,8 +128,11 @@ function getModal(){
 							document.body.innerHTML = data;
 						},
 						error: function(request, status, error){
-							alert('ajax 통신 실패')
-							alert(error);
+							console.log(request);
+							console.log(status);
+							console.log(error);
+							alert('Error: Menu Soldout or Server Error.\nPlease place your order again.\n'+
+							      'Please ask for assistance if the problem persists.');
 						}
 					})
 				})

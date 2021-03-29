@@ -19,7 +19,9 @@ INSERT INTO "INGRD_USE" VALUES (2,3,5.0);
 INSERT INTO "INGRD_USE" VALUES (2,9,1.0);
 INSERT INTO "INGRD_USE" VALUES (2,10,2.0);
 INSERT INTO "INGRD_USE" VALUES (2,14,5.0);
+INSERT INTO "INGRD_USE" VALUES (12,25,20.0);
 INSERT INTO "INGRD_USE" VALUES (18,15,1.0);
+INSERT INTO "INGRD_USE" VALUES (37,25,10.0);
 INSERT INTO "INGRD_USE" VALUES (99,16,1.0);
 INSERT INTO "INGRD_USE" VALUES (100,17,1.0);
 INSERT INTO "INGRD_USE" VALUES (101,18,1.0);
@@ -285,9 +287,9 @@ INSERT INTO "INGREDIENT" VALUES (23,'윙',8.0,'EA',NULL);
 INSERT INTO "INGREDIENT" VALUES (24,'순살치킨조각',10.0,'EA',NULL);
 INSERT INTO "INGREDIENT" VALUES (25,'감자',200.0,'g','https://via.placeholder.com/150');
 INSERT INTO "INGREDIENT" VALUES (26,'옥수수',200.0,'g','https://via.placeholder.com/150');
-
-
-
+INSERT INTO "MENU" VALUES (1,'스위트어스어썸버거','https://via.placeholder.com/150',5600,'글로벌 브랜드 스위트 어스(Sweet Earth) 식물성 패티를 사용하여 고기의 육식감, 풍미, 육즙을 그대로 재현한 대체육 버거',0,186.0,440.0,21.0,38.0,589.0,29.0,12.0,4.0,29.0,0.0,'밀, 대두, 아황산류');
+INSERT INTO "MENU" VALUES (2,'스위트어스어썸버거세트','https://via.placeholder.com/150',7400,'글로벌 브랜드 스위트 어스(Sweet Earth) 식물성 패티를 사용하여 고기의 육식감, 풍미, 육즙을 그대로 재현한 대체육 버거',0,692.0,835.0,24.0,44.0,925.0,46.0,43.0,8.0,50.0,0.0,'세트(팩/콤보) 제품의 알레르기 유발성분은 각 단품별 소개 페이지에서 확인 가능합니다');
+INSERT INTO "MENU" VALUES (3,'불고기버거','https://via.placeholder.com/150',3900,'불고기버거 볼륨 가득한 패티와 불고기 소스가 잘 조화된 영양만점의 햄버거',0,162.0,442.0,18.0,32.0,720.0,36.0,9.0,6.5,43.0,0.0,NULL);
 INSERT INTO "MENU" VALUES (4,'새우버거','/static/img/menu/b_srimp.png',3900,'더 커지고, 더 맛있어진 새우 패티로 고유의 맛을 강화한 오리지널 새우버거',0,179.0,492.0,15.0,27.0,810.0,40.0,7.0,4.7,31.0,0.0,NULL);
 
 INSERT INTO "MENU" VALUES (7,'콜라(S,스몰)','/static/img/menu/d_coke.png',1000,'햄버거에 필수 음료 콜라',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
@@ -300,7 +302,7 @@ INSERT INTO "MENU" VALUES (13,'치즈스틱','/static/img/menu/de_cheezestick_R.
 
 
 
-
+INSERT INTO "MENU" VALUES (18,'토핑-비프패티','https://via.placeholder.com/150',1200,NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO "MENU" VALUES (19,'밀리터리버거','/static/img/menu/b_military.png',5400,'취향대로 조립해 먹는 "군대리아" 컨셉의 KIT타입 버거',0,329.0,813.0,27.0,48.0,1486.0,74.0,33.0,14.0,NULL,0.0,'난류, 밀, 대두, 우유, 토마토, 돼지고기, 조개류(굴), 쇠고기');
 
 
@@ -365,28 +367,32 @@ INSERT INTO "MENU" VALUES (77,'우유','/static/img/menu/d_milk.png',1500,NULL,N
 
 INSERT INTO "MENU" VALUES (79,'오렌지주스(PET)','/static/img/menu/d_oragej.png',2500,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO "MENU" VALUES (80,'아이스티','/static/img/menu/d_icetea.png',2200,'달콤한 복숭아 맛의 시원한 아이스 드링크',0,310.0,160.0,0.0,0.0,0.0,0.0,39.0,0.0,NULL,0.0,'복숭아');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+INSERT INTO "MENU" VALUES (99,'토핑-슬라이스햄','https://via.placeholder.com/150',300,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO "MENU" VALUES (100,'토핑-L치즈','https://via.placeholder.com/150',300,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO "MENU" VALUES (101,'토핑-베이컨','https://via.placeholder.com/150',500,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO "MENU" VALUES (102,'토핑-토마토','https://via.placeholder.com/150',300,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+
 INSERT INTO "MANAGER" VALUES (1, 'admin', '1234', '홍길동', '매니저'); 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 COMMIT;

@@ -134,6 +134,7 @@ function getModal(){
 							sessionStorage.clear();
 							alert('Error: Menu Soldout or Server Error.\nPlease place your order again.\n'+
 							      'Please ask for assistance if the problem persists.');
+							window.location.replace("/order");
 						}
 					})
 				})

@@ -131,11 +131,11 @@ function getModal(){
 							console.log(request);
 							console.log(status);
 							console.log(error);
-							sessionStorage.clear();
 							alert('Error: Menu Soldout or Server Error.\nPlease place your order again.\n'+
 							      'Please ask for assistance if the problem persists.');
 						},
 						complete: function(data){
+							sessionStorage.clear();
 							new Promise((resolve, reject) => {
 								setTimeout(() => resolve("result"), 2000)
 							})

@@ -133,6 +133,13 @@ function getModal(){
 							console.log(error);
 							alert('Error: Menu Soldout or Server Error.\nPlease place your order again.\n'+
 							      'Please ask for assistance if the problem persists.');
+						},
+						complete: function(data){
+							sessionStorage.clear();
+							new Promise((resolve, reject) => {
+								setTimeout(() => resolve("result"), 2000)
+							})
+								.finally(() => window.location.replace("/order"))
 						}
 					})
 				})

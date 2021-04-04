@@ -436,7 +436,7 @@ function addToCartSet() {
 	drink_info = [];
 }
 
-function addToCart(name, price) {
+function addToCart(menu_id, name, price) {
 	const id = "only";
 	// 중복검사 -> 똑같은거 또 고르면 수량 +1, +가격 됨
 	const result = findSameItem(name, price, id);
@@ -447,6 +447,7 @@ function addToCart(name, price) {
 	if (curr_amount === 1) {
 		addToHtml([name], curr_amount, curr_price);
 		const itemObj = {
+			menu_id: menu_id,
 			name: name,
 			amount: curr_amount,
 			price: curr_price,
@@ -559,7 +560,7 @@ function chooseModalCategory(name, price) {
 }
 
 // 세트 메뉴 선택시, 디저트/음료 선택 모달
-function getSetModal(name, price) {
+function getSetModal(menu_id, name, price) {
 	var modal_set = document.getElementById("modal_set");
 	var close_set_btn = document.getElementsByClassName("modal_close_set")[0];
 
@@ -678,7 +679,7 @@ function displayAllergyNutrient(allergy_info, nutrients) {
 }
 
 // 모달
-function getModal(name, price) {
+function getModal(menu_id, name, price) {
 	// Get the modal
 	var modal = document.getElementById("myModal");
 	var close_btn = document.getElementsByClassName("modal_close")[0];
@@ -702,12 +703,12 @@ function getModal(name, price) {
 	// 단품/세트 버튼 클릭 시
 	only_btn.onclick = function () {
 		modal.style.display = "none";
-		addToCart(name, price);
+		addToCart(menu_id, name, price);
 	};
 	set_btn.onclick = function () {
 		name = name + "(세트)";
 		modal.style.display = "none";
-		getSetModal(name, set_price);
+		getSetModal(menu_id, name, set_price);
 	};
 
 	// When the user clicks on <span> (x), close the modal
@@ -736,10 +737,10 @@ function getValueFromBtn(menu) {
 
 		// 햄버거 메뉴만 클릭했을  모달 창이 뜨도록
 		if (menu.dataset.type === "hamburger") {
-			getModal(name, price);
+			getModal(menu_id, name, price);
 			menuShowdata(name, img, menu_id);
 		} else {
-			addToCart(name, price, menu_id);
+			addToCart(menu_id, name, price);
 			menuShowdata(name, img, menu_id);
 		}
 	});

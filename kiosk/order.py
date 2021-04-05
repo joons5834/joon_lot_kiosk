@@ -146,7 +146,7 @@ def register():
     # 형태 변환 전 1차 가공: ORDER_ITEM 테이블 구조에 맞는 형태로 입력을 변환한다.
     for item in items:
         print('name:', item['name'])
-        main_id = fetch_menu_id(item['name'])  # MAIN_DISH_ID를 구한다
+        main_id = item['menu_id']  # MAIN_DISH_ID를 구한다
         main_dish_total = item['price']
         item['options'] = []
         if item['id'] == 'set':
@@ -162,6 +162,7 @@ def register():
     print('raw_list:', raw_list)
     
     # 2차 가공: 같은 MAIN_DISH끼리 묶어 QTY, OPTIONS를 합치고 item_no를 부여한다.
+    # TODO: Is it Needed?
     i = 1
     insert_opt_list = []
     raw_list = sorted(raw_list, key=lambda x: x[1])

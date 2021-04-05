@@ -3,13 +3,16 @@
 # https://flask.palletsprojects.com/en/1.1.x/tutorial/blog/ 참고
 import functools
 import json
+import os
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify, current_app
 )
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 from kiosk.db import get_db
 from kiosk.auth import login_required
+
 
 bp = Blueprint('manage_menu', __name__, url_prefix='/manage_menu')
 
@@ -66,6 +69,7 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
+
 @bp.route('/add', methods=['POST'])
 def add_menu():
     db = get_db()
@@ -112,17 +116,19 @@ def add_menu():
         db.close()
         return redirect(url_for('manage_menu.view_menu'))
 
-
+def allowed_img_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_IMG_EXTENSIONS']
 
 @bp.route('/change', methods=['POST'])
 def change_menu():
+    
     db = get_db()
     c = db.cursor()
 
     if request.method=='POST':
         menu_id = request.form['id']
         menu_name = request.form['name']
-        #menu_image = str(request.form['img'])
         menu_price = int(request.form['price'])
         menu_desc = request.form['desc']
         menu_weight = float(request.form['weight'])
@@ -136,8 +142,27 @@ def change_menu():
         menu_satfat_pct = float(request.form['satfat_pct'])
         menu_caff = float(request.form['caff'])
         menu_allergy = request.form['allergy']
-        
-        db.execute('UPDATE MENU SET NAME=?, PRICE=?, DESC=?, WEIGHT_G=?, KCAL=?, PROTEIN_G=?, PROTEIN_PCENT=?, SODIUM_MG=?, SODIUM_PCENT=?, SUGAR_G=?, SAT_FAT_G=?, SAT_FAT_PCENT=?, CAFFEINE_MG=?, ALLERGY_INFO=? WHERE ID=?',(menu_name, menu_price, menu_desc, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy, menu_id)
+        image_path = ""
+
+        # check if the post request has the file part
+        if 'img' not in request.files:
+            flash('No file part')
+            return redirect(url_for('manage_menu.view_menu'))
+        file = request.files['img']
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(url_for('manage_menu.view_menu'))
+        if file and allowed_img_file(file.filename):
+            filename = menu_id + '.' + secure_filename(file.filename).rsplit('.', 1)[1].lower()
+            abs_path = os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)
+            image_path = '/' + os.path.relpath(abs_path,start=current_app.root_path)
+            image_path = image_path.replace('\\','/')
+            print('image_path:', image_path)
+            file.save(abs_path)
+            print(f"uploaded {os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)}")
+        db.execute('UPDATE MENU SET NAME=?, IMAGE_PATH=?, PRICE=?, DESC=?, WEIGHT_G=?, KCAL=?, PROTEIN_G=?, PROTEIN_PCENT=?, SODIUM_MG=?, SODIUM_PCENT=?, SUGAR_G=?, SAT_FAT_G=?, SAT_FAT_PCENT=?, CAFFEINE_MG=?, ALLERGY_INFO=? WHERE ID=?',(menu_name, image_path, menu_price, menu_desc, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy, menu_id)
                    )
         db.commit()
         db.close()

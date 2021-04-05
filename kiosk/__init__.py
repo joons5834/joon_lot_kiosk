@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 from kiosk.db import get_db
 from flask_socketio import SocketIO
 
@@ -12,6 +12,8 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'kiosk.sqlite'),
+        MENU_IMAGE_FOLDER = os.path.join(app.root_path, 'static', 'img', 'menu'),
+        ALLOWED_IMG_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
     )
 
     if test_config is None:

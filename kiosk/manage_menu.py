@@ -69,6 +69,35 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
+def allowed_img_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_IMG_EXTENSIONS']
+
+def upload_menu_img(cursor, file, menu_id, is_replace):
+    # if user does not select file, browser also
+    # submit an empty part without filename
+    if file.filename == '':
+        flash('No selected file')
+        return False
+    if not file or not allowed_img_file(file.filename):
+        return False
+
+    if is_replace:
+        cursor.execute('SELECT IMAGE_PATH FROM MENU WHERE ID=?', (menu_id,))
+        old_file  = cursor.fetchone()[0][1:]
+        old_file = os.path.join(current_app.root_path, old_file)
+        if os.path.exists(old_file):
+            os.remove(old_file)
+    filename = secure_filename(str(menu_id) + '.' + file.filename.rsplit('.', 1)[1].lower())
+    abs_path = os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)
+    image_path = '/' + os.path.relpath(abs_path,start=current_app.root_path)
+    image_path = image_path.replace('\\','/')
+    print('image_path:', image_path)
+    file.save(abs_path)
+    print(f"uploaded {os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)}")
+    cursor.execute('UPDATE MENU SET IMAGE_PATH=? WHERE ID=?', (image_path, menu_id))
+    return True
+
 
 @bp.route('/add', methods=['POST'])
 def add_menu():
@@ -76,7 +105,7 @@ def add_menu():
     c = db.cursor()
     if request.method == 'POST':
         menu_name = request.form['name']
-        menu_image = str(request.form['img'])
+        # menu_image = str(request.form['img'])
         menu_price = int(request.form['price'])
         menu_desc = request.form['desc']
         menu_weight = float(request.form['weight'])
@@ -91,7 +120,12 @@ def add_menu():
         menu_caff = float(request.form['caff'])
         menu_allergy = request.form['allergy']
         menu_category = request.form['category']
-        
+        # check if the post request has the file part
+        if 'img' not in request.files:
+            flash('No file part')
+            return redirect(url_for('manage_menu.view_menu'))
+        file = request.files['img']
+
         error = None
     
         if db.execute(
@@ -100,10 +134,13 @@ def add_menu():
             error = 'Menu {} is already registered.'.format(menu_name)
 
         if error is None:
-            c.execute(
-                'INSERT INTO MENU (NAME, IMAGE_PATH, PRICE, DESC, IS_SOLDOUT, WEIGHT_G, KCAL, PROTEIN_G, PROTEIN_PCENT, SODIUM_MG, SODIUM_PCENT, SUGAR_G, SAT_FAT_G, SAT_FAT_PCENT, CAFFEINE_MG, ALLERGY_INFO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',(menu_name, menu_image, menu_price, menu_desc, 0, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy)
+            c.execute('''
+                INSERT INTO MENU (NAME, PRICE, DESC, IS_SOLDOUT, WEIGHT_G, KCAL, PROTEIN_G, PROTEIN_PCENT, SODIUM_MG, SODIUM_PCENT, SUGAR_G, SAT_FAT_G, SAT_FAT_PCENT, CAFFEINE_MG, ALLERGY_INFO) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                (menu_name, menu_price, menu_desc, 0, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy)
                 )
             menu_id = c.lastrowid
+            upload_menu_img(c, file, menu_id, is_replace=False)
             c.execute(
                 'INSERT INTO "MENU_CATEGORY" VALUES (?,?)', (menu_id, menu_category)
                 )
@@ -116,9 +153,7 @@ def add_menu():
         db.close()
         return redirect(url_for('manage_menu.view_menu'))
 
-def allowed_img_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_IMG_EXTENSIONS']
+
 
 @bp.route('/change', methods=['POST'])
 def change_menu():
@@ -142,28 +177,17 @@ def change_menu():
         menu_satfat_pct = float(request.form['satfat_pct'])
         menu_caff = float(request.form['caff'])
         menu_allergy = request.form['allergy']
-        image_path = ""
 
         # check if the post request has the file part
         if 'img' not in request.files:
             flash('No file part')
             return redirect(url_for('manage_menu.view_menu'))
         file = request.files['img']
-        # if user does not select file, browser also
-        # submit an empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(url_for('manage_menu.view_menu'))
-        if file and allowed_img_file(file.filename):
-            filename = menu_id + '.' + secure_filename(file.filename).rsplit('.', 1)[1].lower()
-            abs_path = os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)
-            image_path = '/' + os.path.relpath(abs_path,start=current_app.root_path)
-            image_path = image_path.replace('\\','/')
-            print('image_path:', image_path)
-            file.save(abs_path)
-            print(f"uploaded {os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)}")
-        db.execute('UPDATE MENU SET NAME=?, IMAGE_PATH=?, PRICE=?, DESC=?, WEIGHT_G=?, KCAL=?, PROTEIN_G=?, PROTEIN_PCENT=?, SODIUM_MG=?, SODIUM_PCENT=?, SUGAR_G=?, SAT_FAT_G=?, SAT_FAT_PCENT=?, CAFFEINE_MG=?, ALLERGY_INFO=? WHERE ID=?',(menu_name, image_path, menu_price, menu_desc, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy, menu_id)
-                   )
+
+
+        c.execute('UPDATE MENU SET NAME=?, PRICE=?, DESC=?, WEIGHT_G=?, KCAL=?, PROTEIN_G=?, PROTEIN_PCENT=?, SODIUM_MG=?, SODIUM_PCENT=?, SUGAR_G=?, SAT_FAT_G=?, SAT_FAT_PCENT=?, CAFFEINE_MG=?, ALLERGY_INFO=? WHERE ID=?'
+                   ,(menu_name, menu_price, menu_desc, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy, menu_id))
+        upload_menu_img(c, file, menu_id, is_replace=True)
         db.commit()
         db.close()
 

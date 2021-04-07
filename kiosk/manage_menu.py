@@ -92,7 +92,6 @@ def upload_menu_img(db, file, menu_id, is_replace):
             old_file = os.path.join(current_app.root_path, old_file)
             if os.path.exists(old_file):
                 os.remove(old_file)
-    # raise Exception
     filename = secure_filename(str(menu_id) + '.' + file.filename.rsplit('.', 1)[1].lower())
     abs_path = os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)
     image_path = '/' + os.path.relpath(abs_path,start=current_app.root_path)
@@ -102,7 +101,6 @@ def upload_menu_img(db, file, menu_id, is_replace):
     print(f"uploaded {os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)}")
     with db:
         db.execute('UPDATE MENU SET IMAGE_PATH=? WHERE ID=?', (image_path, menu_id))
-    # raise Exception
     return True
 
 
@@ -110,7 +108,6 @@ def upload_menu_img(db, file, menu_id, is_replace):
 def add_menu():
     if request.method == 'POST':
         menu_name = request.form['name']
-        # menu_image = str(request.form['img'])
         menu_price = int(request.form['price'])
         menu_desc = request.form['desc']
         menu_weight = float(request.form['weight'])
@@ -148,7 +145,6 @@ def add_menu():
                     (menu_name, menu_price, menu_desc, 0, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy)
                     )
                 menu_id = c.lastrowid
-                # raise Exception
                 upload_menu_img(db, file, menu_id, is_replace=False)
                 c.execute(
                     'INSERT INTO "MENU_CATEGORY" VALUES (?,?)', (menu_id, menu_category)

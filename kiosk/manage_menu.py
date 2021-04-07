@@ -83,11 +83,16 @@ def upload_menu_img(db, file, menu_id, is_replace):
         return False
 
     if is_replace:
-        cursor.execute('SELECT IMAGE_PATH FROM MENU WHERE ID=?', (menu_id,))
-        old_file  = cursor.fetchone()[0][1:]
-        old_file = os.path.join(current_app.root_path, old_file)
-        if os.path.exists(old_file):
-            os.remove(old_file)
+        result = None
+        with db:
+            result = db.execute('SELECT IMAGE_PATH FROM MENU WHERE ID=?', (menu_id,)
+            ).fetchone()[0]
+        if result:
+            old_file = result[1:]
+            old_file = os.path.join(current_app.root_path, old_file)
+            if os.path.exists(old_file):
+                os.remove(old_file)
+    # raise Exception
     filename = secure_filename(str(menu_id) + '.' + file.filename.rsplit('.', 1)[1].lower())
     abs_path = os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)
     image_path = '/' + os.path.relpath(abs_path,start=current_app.root_path)

@@ -73,7 +73,7 @@ def allowed_img_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_IMG_EXTENSIONS']
 
-def upload_menu_img(cursor, file, menu_id, is_replace):
+def upload_menu_img(db, file, menu_id, is_replace):
     # if user does not select file, browser also
     # submit an empty part without filename
     if file.filename == '':
@@ -95,14 +95,14 @@ def upload_menu_img(cursor, file, menu_id, is_replace):
     print('image_path:', image_path)
     file.save(abs_path)
     print(f"uploaded {os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)}")
-    cursor.execute('UPDATE MENU SET IMAGE_PATH=? WHERE ID=?', (image_path, menu_id))
+    with db:
+        db.execute('UPDATE MENU SET IMAGE_PATH=? WHERE ID=?', (image_path, menu_id))
+    # raise Exception
     return True
 
 
 @bp.route('/add', methods=['POST'])
 def add_menu():
-    db = get_db()
-    c = db.cursor()
     if request.method == 'POST':
         menu_name = request.form['name']
         # menu_image = str(request.form['img'])
@@ -127,30 +127,31 @@ def add_menu():
         file = request.files['img']
 
         error = None
-    
-        if db.execute(
-            'SELECT ID FROM "MENU" WHERE NAME = ?', (menu_name,)
-        ).fetchone() is not None:
-            error = 'Menu {} is already registered.'.format(menu_name)
+        db = get_db()
+        
+        with db:
+            if db.execute(
+                'SELECT ID FROM "MENU" WHERE NAME = ?', (menu_name,)
+            ).fetchone() is not None:
+                error = 'Menu {} is already registered.'.format(menu_name)
 
-        if error is None:
-            c.execute('''
-                INSERT INTO MENU (NAME, PRICE, DESC, IS_SOLDOUT, WEIGHT_G, KCAL, PROTEIN_G, PROTEIN_PCENT, SODIUM_MG, SODIUM_PCENT, SUGAR_G, SAT_FAT_G, SAT_FAT_PCENT, CAFFEINE_MG, ALLERGY_INFO) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                (menu_name, menu_price, menu_desc, 0, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy)
-                )
-            menu_id = c.lastrowid
-            upload_menu_img(c, file, menu_id, is_replace=False)
-            c.execute(
-                'INSERT INTO "MENU_CATEGORY" VALUES (?,?)', (menu_id, menu_category)
-                )
-            db.commit()
-            db.close()
-            flash(f'{menu_name}을/를 추가하였습니다.')
-            return redirect(url_for('manage_menu.view_menu'))
+            if error is None:
+                c = db.cursor()
+                c.execute('''
+                    INSERT INTO MENU (NAME, PRICE, DESC, IS_SOLDOUT, WEIGHT_G, KCAL, PROTEIN_G, PROTEIN_PCENT, SODIUM_MG, SODIUM_PCENT, SUGAR_G, SAT_FAT_G, SAT_FAT_PCENT, CAFFEINE_MG, ALLERGY_INFO) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                    (menu_name, menu_price, menu_desc, 0, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy)
+                    )
+                menu_id = c.lastrowid
+                # raise Exception
+                upload_menu_img(db, file, menu_id, is_replace=False)
+                c.execute(
+                    'INSERT INTO "MENU_CATEGORY" VALUES (?,?)', (menu_id, menu_category)
+                    )
+                flash(f'{menu_name}을/를 추가하였습니다.')
+                return redirect(url_for('manage_menu.view_menu'))
 
         flash(error)
-        db.close()
         return redirect(url_for('manage_menu.view_menu'))
 
 
@@ -184,12 +185,10 @@ def change_menu():
             return redirect(url_for('manage_menu.view_menu'))
         file = request.files['img']
 
-
-        c.execute('UPDATE MENU SET NAME=?, PRICE=?, DESC=?, WEIGHT_G=?, KCAL=?, PROTEIN_G=?, PROTEIN_PCENT=?, SODIUM_MG=?, SODIUM_PCENT=?, SUGAR_G=?, SAT_FAT_G=?, SAT_FAT_PCENT=?, CAFFEINE_MG=?, ALLERGY_INFO=? WHERE ID=?'
-                   ,(menu_name, menu_price, menu_desc, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy, menu_id))
-        upload_menu_img(c, file, menu_id, is_replace=True)
-        db.commit()
-        db.close()
+        with db:
+            db.execute('UPDATE MENU SET NAME=?, PRICE=?, DESC=?, WEIGHT_G=?, KCAL=?, PROTEIN_G=?, PROTEIN_PCENT=?, SODIUM_MG=?, SODIUM_PCENT=?, SUGAR_G=?, SAT_FAT_G=?, SAT_FAT_PCENT=?, CAFFEINE_MG=?, ALLERGY_INFO=? WHERE ID=?'
+                    ,(menu_name, menu_price, menu_desc, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy, menu_id))
+            upload_menu_img(db, file, menu_id, is_replace=True)
 
         flash('메뉴 수정이 완료되었습니다.')
         return redirect(url_for('manage_menu.view_menu'))

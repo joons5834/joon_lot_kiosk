@@ -73,6 +73,29 @@ def allowed_img_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_IMG_EXTENSIONS']
 
+def get_menu_image_path(db, menu_id):
+    result = db.execute('SELECT IMAGE_PATH FROM MENU WHERE ID=?', (menu_id,)
+    ).fetchone()[0]
+    if result:
+        curr = os.path.join(current_app.root_path, result[1:])
+        if not os.path.exists(curr):
+            return ""
+        changed = curr + 'old'
+        os.rename(curr, changed)
+        return changed
+    else:
+        return ""
+
+def delete_menu_img(abs_path):
+    try:
+        if os.path.exists(abs_path):
+            os.remove(abs_path)
+            return True
+    except:
+        flash("Logical Edit/Delete Complete. But couldn't remove the old file from the filesystem.")
+        return False
+    
+
 def upload_menu_img(db, file, menu_id, is_replace):
     # if user does not select file, browser also
     # submit an empty part without filename
@@ -81,17 +104,9 @@ def upload_menu_img(db, file, menu_id, is_replace):
         return False
     if not file or not allowed_img_file(file.filename):
         return False
-
     if is_replace:
-        result = None
-        with db:
-            result = db.execute('SELECT IMAGE_PATH FROM MENU WHERE ID=?', (menu_id,)
-            ).fetchone()[0]
-        if result:
-            old_file = result[1:]
-            old_file = os.path.join(current_app.root_path, old_file)
-            if os.path.exists(old_file):
-                os.remove(old_file)
+        old_path = get_menu_image_path(db, menu_id)
+        
     filename = secure_filename(str(menu_id) + '.' + file.filename.rsplit('.', 1)[1].lower())
     abs_path = os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)
     image_path = '/' + os.path.relpath(abs_path,start=current_app.root_path)
@@ -101,6 +116,9 @@ def upload_menu_img(db, file, menu_id, is_replace):
     print(f"uploaded {os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)}")
     with db:
         db.execute('UPDATE MENU SET IMAGE_PATH=? WHERE ID=?', (image_path, menu_id))
+    if is_replace:
+        delete_menu_img(old_path)
+
     return True
 
 
@@ -197,17 +215,16 @@ def change_menu():
 @bp.route('/delete', methods=['POST'])
 def delete_menu():
     db = get_db()
-    c = db.cursor()
     if request.method=='POST':
         menu_id = request.form['id']
         menu_name=request.form['name']
-        db.execute(
-            'DELETE FROM "MENU_CATEGORY" WHERE MENU_ID=?', (menu_id,))
-        db.execute(
-            'DELETE FROM "MENU" WHERE ID=?', (menu_id,))
-        db.commit()
-        db.close()
+        old_file = get_menu_image_path(db, menu_id)
+        with db:
+            db.execute(
+                'DELETE FROM "MENU_CATEGORY" WHERE MENU_ID=?', (menu_id,))
+            db.execute(
+                'DELETE FROM "MENU" WHERE ID=?', (menu_id,))
 
-        name = menu_name
-        flash(f'{name}을/를 삭제하였습니다.')
+        flash(f'{menu_name}을/를 삭제하였습니다.')
+        delete_menu_img(old_file)
         return redirect(url_for('manage_menu.view_menu'))

@@ -3,13 +3,16 @@
 # https://flask.palletsprojects.com/en/1.1.x/tutorial/blog/ 참고
 import functools
 import json
+import os
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify, current_app
 )
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 from kiosk.db import get_db
 from kiosk.auth import login_required
+
 
 bp = Blueprint('manage_menu', __name__, url_prefix='/manage_menu')
 
@@ -66,13 +69,63 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
+def allowed_img_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_IMG_EXTENSIONS']
+
+def get_menu_image_path(db, menu_id):
+    result = db.execute('SELECT IMAGE_PATH FROM MENU WHERE ID=?', (menu_id,)
+    ).fetchone()[0]
+    if result:
+        curr = os.path.join(current_app.root_path, result[1:])
+        if not os.path.exists(curr):
+            return ""
+        changed = curr + 'old'
+        os.rename(curr, changed)
+        return changed
+    else:
+        return ""
+
+def delete_menu_img(abs_path):
+    try:
+        if os.path.exists(abs_path):
+            os.remove(abs_path)
+            return True
+    except:
+        flash("Logical Edit/Delete Complete. But couldn't remove the old file from the filesystem.")
+        return False
+    
+
+def upload_menu_img(db, file, menu_id, is_replace):
+    # if user does not select file, browser also
+    # submit an empty part without filename
+    if file.filename == '':
+        flash('No selected file')
+        return False
+    if not file or not allowed_img_file(file.filename):
+        return False
+    if is_replace:
+        old_path = get_menu_image_path(db, menu_id)
+        
+    filename = secure_filename(str(menu_id) + '.' + file.filename.rsplit('.', 1)[1].lower())
+    abs_path = os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)
+    image_path = '/' + os.path.relpath(abs_path,start=current_app.root_path)
+    image_path = image_path.replace('\\','/')
+    print('image_path:', image_path)
+    file.save(abs_path)
+    print(f"uploaded {os.path.join(current_app.config['MENU_IMAGE_FOLDER'], filename)}")
+    with db:
+        db.execute('UPDATE MENU SET IMAGE_PATH=? WHERE ID=?', (image_path, menu_id))
+    if is_replace:
+        delete_menu_img(old_path)
+
+    return True
+
+
 @bp.route('/add', methods=['POST'])
 def add_menu():
-    db = get_db()
-    c = db.cursor()
     if request.method == 'POST':
         menu_name = request.form['name']
-        menu_image = str(request.form['img'])
         menu_price = int(request.form['price'])
         menu_desc = request.form['desc']
         menu_weight = float(request.form['weight'])
@@ -87,42 +140,50 @@ def add_menu():
         menu_caff = float(request.form['caff'])
         menu_allergy = request.form['allergy']
         menu_category = request.form['category']
-        
-        error = None
-    
-        if db.execute(
-            'SELECT ID FROM "MENU" WHERE NAME = ?', (menu_name,)
-        ).fetchone() is not None:
-            error = 'Menu {} is already registered.'.format(menu_name)
-
-        if error is None:
-            c.execute(
-                'INSERT INTO MENU (NAME, IMAGE_PATH, PRICE, DESC, IS_SOLDOUT, WEIGHT_G, KCAL, PROTEIN_G, PROTEIN_PCENT, SODIUM_MG, SODIUM_PCENT, SUGAR_G, SAT_FAT_G, SAT_FAT_PCENT, CAFFEINE_MG, ALLERGY_INFO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',(menu_name, menu_image, menu_price, menu_desc, 0, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy)
-                )
-            menu_id = c.lastrowid
-            c.execute(
-                'INSERT INTO "MENU_CATEGORY" VALUES (?,?)', (menu_id, menu_category)
-                )
-            db.commit()
-            db.close()
-            flash(f'{menu_name}을/를 추가하였습니다.')
+        # check if the post request has the file part
+        if 'img' not in request.files:
+            flash('No file part')
             return redirect(url_for('manage_menu.view_menu'))
+        file = request.files['img']
+
+        error = None
+        db = get_db()
+        
+        with db:
+            if db.execute(
+                'SELECT ID FROM "MENU" WHERE NAME = ?', (menu_name,)
+            ).fetchone() is not None:
+                error = 'Menu {} is already registered.'.format(menu_name)
+
+            if error is None:
+                c = db.cursor()
+                c.execute('''
+                    INSERT INTO MENU (NAME, PRICE, DESC, IS_SOLDOUT, WEIGHT_G, KCAL, PROTEIN_G, PROTEIN_PCENT, SODIUM_MG, SODIUM_PCENT, SUGAR_G, SAT_FAT_G, SAT_FAT_PCENT, CAFFEINE_MG, ALLERGY_INFO) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                    (menu_name, menu_price, menu_desc, 0, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy)
+                    )
+                menu_id = c.lastrowid
+                upload_menu_img(db, file, menu_id, is_replace=False)
+                c.execute(
+                    'INSERT INTO "MENU_CATEGORY" VALUES (?,?)', (menu_id, menu_category)
+                    )
+                flash(f'{menu_name}을/를 추가하였습니다.')
+                return redirect(url_for('manage_menu.view_menu'))
 
         flash(error)
-        db.close()
         return redirect(url_for('manage_menu.view_menu'))
 
 
 
 @bp.route('/change', methods=['POST'])
 def change_menu():
+    
     db = get_db()
     c = db.cursor()
 
     if request.method=='POST':
         menu_id = request.form['id']
         menu_name = request.form['name']
-        #menu_image = str(request.form['img'])
         menu_price = int(request.form['price'])
         menu_desc = request.form['desc']
         menu_weight = float(request.form['weight'])
@@ -136,11 +197,17 @@ def change_menu():
         menu_satfat_pct = float(request.form['satfat_pct'])
         menu_caff = float(request.form['caff'])
         menu_allergy = request.form['allergy']
-        
-        db.execute('UPDATE MENU SET NAME=?, PRICE=?, DESC=?, WEIGHT_G=?, KCAL=?, PROTEIN_G=?, PROTEIN_PCENT=?, SODIUM_MG=?, SODIUM_PCENT=?, SUGAR_G=?, SAT_FAT_G=?, SAT_FAT_PCENT=?, CAFFEINE_MG=?, ALLERGY_INFO=? WHERE ID=?',(menu_name, menu_price, menu_desc, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy, menu_id)
-                   )
-        db.commit()
-        db.close()
+
+        # check if the post request has the file part
+        if 'img' not in request.files:
+            flash('No file part')
+            return redirect(url_for('manage_menu.view_menu'))
+        file = request.files['img']
+
+        with db:
+            db.execute('UPDATE MENU SET NAME=?, PRICE=?, DESC=?, WEIGHT_G=?, KCAL=?, PROTEIN_G=?, PROTEIN_PCENT=?, SODIUM_MG=?, SODIUM_PCENT=?, SUGAR_G=?, SAT_FAT_G=?, SAT_FAT_PCENT=?, CAFFEINE_MG=?, ALLERGY_INFO=? WHERE ID=?'
+                    ,(menu_name, menu_price, menu_desc, menu_weight, menu_kcal, menu_protein_g, menu_protein_pct, menu_sodium_g, menu_sodium_pct, menu_sugar, menu_satfat_g, menu_satfat_pct, menu_caff, menu_allergy, menu_id))
+            upload_menu_img(db, file, menu_id, is_replace=True)
 
         flash('메뉴 수정이 완료되었습니다.')
         return redirect(url_for('manage_menu.view_menu'))
@@ -148,17 +215,16 @@ def change_menu():
 @bp.route('/delete', methods=['POST'])
 def delete_menu():
     db = get_db()
-    c = db.cursor()
     if request.method=='POST':
         menu_id = request.form['id']
         menu_name=request.form['name']
-        db.execute(
-            'DELETE FROM "MENU_CATEGORY" WHERE MENU_ID=?', (menu_id,))
-        db.execute(
-            'DELETE FROM "MENU" WHERE ID=?', (menu_id,))
-        db.commit()
-        db.close()
+        old_file = get_menu_image_path(db, menu_id)
+        with db:
+            db.execute(
+                'DELETE FROM "MENU_CATEGORY" WHERE MENU_ID=?', (menu_id,))
+            db.execute(
+                'DELETE FROM "MENU" WHERE ID=?', (menu_id,))
 
-        name = menu_name
-        flash(f'{name}을/를 삭제하였습니다.')
+        flash(f'{menu_name}을/를 삭제하였습니다.')
+        delete_menu_img(old_file)
         return redirect(url_for('manage_menu.view_menu'))

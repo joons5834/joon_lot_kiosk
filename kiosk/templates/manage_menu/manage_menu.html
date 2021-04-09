@@ -44,14 +44,14 @@
                         <button class="change_btn" data-filter="change" data-path="{{url_for('manage_menu.change_menu') }}">메뉴 수정</button>
                         <button class="remove_btn" data-filter="delete" data-path="{{url_for('manage_menu.delete_menu') }}">메뉴 삭제</button>
                     </div>
-					<form class="container_describe" name = "manage_menu" method="POST" action="{{ url_for('manage_menu.add_menu') }}">			
+					<form class="container_describe" name = "manage_menu" method="POST" action="{{ url_for('manage_menu.add_menu') }}" enctype="multipart/form-data">			
                     <div class="input_container">
                     	<div class="container_display">
 
                     		<div class="input_container_left">
                     			<div id="image_container">
                                     {% set no_image = url_for('static', filename='img/no_image.png') %}
-                                    <img id="image_path" src="{{ no_image }}" onerror="if (this.src != '{{ no_image }}') this.src = '{{ no_image }}';">
+                                    <img id="image_path" src="{{ no_image }}" data-original="" onerror="if (this.src != '{{ no_image }}') this.src = '{{ no_image }}';">
                                 </div>
                                 <input type="file" id ="image" accept="image/*" onchange="setThumbnail(event);" class="input_img" name="img">
                              </div>

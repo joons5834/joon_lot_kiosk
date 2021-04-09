@@ -71,11 +71,14 @@ function showMenuDetail(){
 }
 
 function fillFormWithDetail(data){
+    const file_input = document.getElementById('image');
     for(let [key, value] of Object.entries(data['menu_detail'])){
         const item = document.getElementById(key.toLowerCase())
         if (item) {
             if (key === 'IMAGE_PATH') {
                 item.setAttribute('src', value)
+                item.dataset.original = value
+                clearInputFile(file_input);
             } else{
                 item.value = value;
             }
@@ -135,10 +138,13 @@ function addMenubtn(){
 
 //이미지 첨부시 보여주기 (다시 다른걸 선택할 경우 문제 발생)
 function setThumbnail(event) { 
+    const img = document.getElementById('image_path');
+    if (event.target.files.length == 0){
+        img.setAttribute("src", img.dataset.original);
+    }
     for (var image of event.target.files) { 
         var reader = new FileReader(); 
         reader.onload = function(event) { 
-            const img = document.getElementById('image_path');
             img.setAttribute("src", event.target.result); 
         };
 
@@ -147,7 +153,20 @@ function setThumbnail(event) {
         } 
     }
 
-
+function clearInputFile(f){
+    if(f.value){
+        try{
+            f.value = ''; //for IE11, latest Chrome/Firefox/Opera...
+        }catch(err){ }
+        if(f.value){ //for IE5 ~ IE10
+            var form = document.createElement('form'),
+                parentNode = f.parentNode, ref = f.nextSibling;
+            form.appendChild(f);
+            form.reset();
+            parentNode.insertBefore(f,ref);
+        }
+    }
+}
 categorySelect();
 showMenuDetail();
 addMenubtn();

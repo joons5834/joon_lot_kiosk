@@ -57,7 +57,6 @@ function showMenuDetail(){
                 dataType : 'JSON',
                 contentType: "application/json",
                 success: function(data){
-                    // alert('성공! 데이터 값');
                     console.log(data)
                     fillFormWithDetail(data);
                 },
@@ -136,7 +135,7 @@ function addMenubtn(){
 
 
 
-//이미지 첨부시 보여주기 (다시 다른걸 선택할 경우 문제 발생)
+
 function setThumbnail(event) { 
     const img = document.getElementById('image_path');
     if (event.target.files.length == 0){

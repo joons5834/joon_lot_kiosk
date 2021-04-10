@@ -285,10 +285,10 @@ function makeList(item) {
 	const price = item.price;
 	// 세트메뉴면 밑에 디저트랑 드링크 옵션내역도 표시해 줘야 함
 	if (item.id === "set") {
-		const dessert_n = "-" + item.dessert[0];
-		const dessert_p = item.dessert[1];
-		const drink_n = "-" + item.drink[0];
-		const drink_p = item.drink[1];
+		const dessert_n = "-" + item.dessert['name'];
+		const dessert_p = item.dessert['price'];
+		const drink_n = "-" + item.drink['name'];
+		const drink_p = item.drink['price'];
 		const main = addToHtml(name, amount, price);
 		const dessert = addToHtml(dessert_n, amount, dessert_p * amount);
 		const drink = addToHtml(drink_n, amount, drink_p * amount);

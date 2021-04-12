@@ -151,12 +151,12 @@ def register():
         item['options'] = []
         if item['id'] == 'set':
             options = []
-            dessert_id = fetch_menu_id(item['dessert'][0])
-            drink_id = fetch_menu_id(item['drink'][0])
-            options.append((dessert_id, 1, item['dessert'][1])) 
-            options.append((drink_id, 1, item['drink'][1]))
+            dessert_id = item['dessert']['id']
+            drink_id = item['drink']['id']
+            options.append((dessert_id, 1, item['dessert']['price'])) 
+            options.append((drink_id, 1, item['drink']['price']))
             item['options'] += options
-            opt_total = item['dessert'][1] + item['drink'][1]
+            opt_total = item['dessert']['price'] + item['drink']['price']
             print('options:', options)
         raw_list.append((order_id, main_id, item['amount'], main_dish_total, item['options']))
     print('raw_list:', raw_list)
@@ -215,11 +215,6 @@ def register():
     db.commit()
     socketio.emit('order complete', order_id)
     return render_template('order/order_num.html', order_id=order_id)
-    
-
-def fetch_menu_id(name):
-    db = get_db()
-    return db.execute('SELECT ID FROM MENU WHERE NAME=?', (name,)).fetchone()[0]
 
 
 @bp.route('/wait_panel')

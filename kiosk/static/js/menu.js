@@ -14,8 +14,9 @@ const ul = basket.querySelector(".basket_items");
 // 선택한 메뉴 정보를 담아 놓는 리스트
 let itemsSelected = [];
 // 세트 메뉴를 고를 경우, 옵션으로 선택한 디저트와 드링크 정보
-let dessert_info = [];
-let drink_info = [];
+let dessert_info = {};
+let drink_info = {};
+let set_main = {};
 // 로컬스토리지에 저장할 때 사용하는 key값
 const ITEM = "item";
 const TOTAL = "total";
@@ -74,7 +75,7 @@ function saveTotal() {
 			if (each.id === "set") {
 				let set_price = each.price / each.amount;
 				set_price =
-					(set_price + each.dessert[1] + each.drink[1]) * each.amount;
+					(set_price + each.dessert.price + each.drink.price) * each.amount;
 				total_price = total_price + set_price;
 			} else {
 				total_price = total_price + each.price;
@@ -136,7 +137,7 @@ function deleteItem(event) {
 			} else {
 				// 세트메뉴는 이름만 가지고는 안 됨. name이 둘 다 치킨버거(세트)여도 옵션이 다르면 다른 주문이기 때문. 그래서 만약 둘 다 메뉴명이 같다면 옵션으로 비교를 해줘야 정확한 삭제가 가능.
 				if (item.name === delete_name) {
-					let opts = `${item.dessert[0]},${item.drink[0]}`;
+					let opts = `${item.dessert.name},${item.drink.name}`;
 					return opts !== delete_name_opts;
 				}
 				return item.name != delete_name;
@@ -224,7 +225,7 @@ function selectionDone() {
 	// set_drink
 	const filter = drink_btn.dataset.filter;
 	const modal_question_set = document.querySelector(".modal_question.set");
-	if (dessert_info.length === 4 && drink_info.length === 0) {
+	if (Object.keys(dessert_info).length === 3 && Object.keys(drink_info).length === 0) {
 		modal_question_set.innerHTML = `
 			세트드링크 1개를 선택해 주세요`;
 		dessert_btn.classList.remove("selected");
@@ -251,7 +252,7 @@ function selectionDone() {
 	}
 }
 
-function drinkOption(d_name, d_price) {
+function drinkOption(d_name, d_price, d_id) {
 	const modal_menus = document.querySelectorAll(".menu_set");
 	const dessert_btn = document.querySelectorAll(".modal_category_btn")[0];
 	const drink_btn = document.querySelectorAll(".modal_category_btn")[1];
@@ -261,22 +262,16 @@ function drinkOption(d_name, d_price) {
 		remained_count = counts[1].querySelectorAll("span")[1],
 		next_selection = modal_bottom_set.querySelectorAll("button")[1];
 	const modal_set_btn_no = document.querySelector(".modal_set_btn.no");
-
-	if (drink_info.length === 0 || drink_info.length === 2) {
-		drink_info.push(d_name);
-		drink_info.push(d_price);
-		curr_count.innerHTML = "2";
-		remained_count.innerHTML = "0";
-	}
-	// 드링크 옵션을 또 선택하면, 이전 선택정보는 사라짐.
-	if (drink_info.length === 4) {
-		drink_info.splice(0, 2);
-	}
+	drink_info.name = d_name;
+	drink_info.price = d_price;
+	drink_info.id = d_id;
+	curr_count.innerHTML = "2";
+	remained_count.innerHTML = "0";
 	// 취소하기 버튼 누르면 선택정보 삭제됨
 	modal_set_btn_no.onclick = function () {
 		modal_set.style.display = "none";
-		dessert_info = [];
-		drink_info = [];
+		dessert_info = {};
+		drink_info = {};
 		curr_count.innerHTML = "0";
 		remained_count.innerHTML = "2";
 
@@ -293,29 +288,19 @@ function drinkOption(d_name, d_price) {
 		console.log(dessert_info, drink_info);
 	};
 	// addToCartSet()으로 넘어감
-	if (drink_info.length === 2) {
-		next_selection.addEventListener("click", selectionDone);
-	}
+	next_selection.addEventListener("click", selectionDone);
 }
 // 디저트 옵션 중 1개 선택하면
-function dessertOption(d_name, d_price, name, price) {
+function dessertOption(d_id, d_name, d_price, name, price) {
 	const modal_bottom_set = document.querySelector(".modal_bottom_set"),
 		counts = modal_bottom_set.querySelectorAll(".many"),
 		curr_count = counts[0].querySelectorAll("span")[1],
 		remained_count = counts[1].querySelectorAll("span")[1],
 		next_selection = modal_bottom_set.querySelectorAll("button")[1];
 	const modal_set_btn_no = document.querySelector(".modal_set_btn.no");
-
-	if (dessert_info.length === 0 || dessert_info.length === 4) {
-		dessert_info.push(d_name);
-		dessert_info.push(d_price);
-		dessert_info.push(name);
-		dessert_info.push(price);
-	}
-	// 디저트 옵션을 또 선택하면, 이전 선택정보는 사라짐
-	if (dessert_info.length === 8) {
-		dessert_info.splice(0, 4);
-	}
+	dessert_info.id = d_id;
+	dessert_info.name = d_name;
+	dessert_info.price = d_price;
 	// 취소하기 버튼 누르면 선택정보 삭제됨
 	modal_set_btn_no.onclick = function () {
 		modal_set.style.display = "none";
@@ -324,12 +309,10 @@ function dessertOption(d_name, d_price, name, price) {
 		remained_count.innerHTML = "2";
 	};
 
-	if (dessert_info.length === 4) {
-		curr_count.innerHTML = "1";
-		remained_count.innerHTML = "1";
-		// 선택완료 버튼을 누르면 음료 선택 창으로 넘어감
-		next_selection.addEventListener("click", selectionDone);
-	}
+	curr_count.innerHTML = "1";
+	remained_count.innerHTML = "1";
+	// 선택완료 버튼을 누르면 음료 선택 창으로 넘어감
+	next_selection.addEventListener("click", selectionDone);
 }
 
 //똑같은 메뉴를 이미 선택한 적 있는지 체크
@@ -408,21 +391,22 @@ function addToHtml(name, curr_amount, curr_price) {
 }
 
 function addToCartSet() {
-	const name = dessert_info[2];
+	const name = set_main.name;
 	// options는 디저트와 드링크 옵션 선택정보
-	const options = `${dessert_info[0]},${drink_info[0]}`;
-	let curr_price = dessert_info[3];
+	const options = `${dessert_info.name},${drink_info.name}`;
+	let curr_price = set_main.price;
 	const id = "set";
 	const curr_amount = 1;
-	curr_price = curr_price + dessert_info[1] + drink_info[1];
-	dessert_info.splice(2, 2);
+	curr_price = curr_price + dessert_info.price + drink_info.price;
+	// dessert_info.splice(2, 2);
 
 	if (curr_amount === 1) {
 		addToHtml([name, options], curr_amount, curr_price);
 		const itemObj = {
+			menu_id: set_main.menu_id,
 			name: name,
 			amount: curr_amount,
-			price: curr_price - dessert_info[1] - drink_info[1],
+			price: curr_price - dessert_info.price - drink_info.price,
 			id: id,
 			dessert: dessert_info,
 			drink: drink_info,
@@ -432,11 +416,11 @@ function addToCartSet() {
 	saveTotal();
 	updateCheck();
 	saveItems();
-	dessert_info = [];
-	drink_info = [];
+	dessert_info = {};
+	drink_info = {};
 }
 
-function addToCart(name, price) {
+function addToCart(menu_id, name, price) {
 	const id = "only";
 	// 중복검사 -> 똑같은거 또 고르면 수량 +1, +가격 됨
 	const result = findSameItem(name, price, id);
@@ -447,6 +431,7 @@ function addToCart(name, price) {
 	if (curr_amount === 1) {
 		addToHtml([name], curr_amount, curr_price);
 		const itemObj = {
+			menu_id: menu_id,
 			name: name,
 			amount: curr_amount,
 			price: curr_price,
@@ -498,14 +483,16 @@ function chooseModalCategory(name, price) {
 	modal_menus.forEach((menu) => {
 		if (menu.dataset.type !== "set_dessert") {
 			menu.classList.add("invisible");
+			const drink_id = menu.dataset.id;
 			const drink_name = menu.querySelector(".menu_drink_name").innerHTML;
 			const drink_price = parseInt(
 				menu.querySelector(".menu_drink_price").innerHTML
 			);
 			menu.addEventListener("click", (event) =>
-				drinkOption(drink_name, drink_price)
+				drinkOption(drink_name, drink_price, drink_id)
 			);
 		} else {
+			const dessert_id = menu.dataset.id;
 			const dessert_name = menu
 				.querySelector(".menu_dessert_name")
 				.innerHTML.trim();
@@ -513,7 +500,7 @@ function chooseModalCategory(name, price) {
 				menu.querySelector(".menu_dessert_price").innerHTML
 			);
 			menu.addEventListener("click", (event) =>
-				dessertOption(dessert_name, dessert_price, name, price)
+				dessertOption(dessert_id, dessert_name, dessert_price, name, price)
 			);
 		}
 	});
@@ -550,8 +537,8 @@ function chooseModalCategory(name, price) {
 					menu.classList.add("invisible");
 				}
 			});
-			dessert_info = [];
-			drink_info = [];
+			dessert_info = {};
+			drink_info = {};
 			curr_count.innerHTML = "0";
 			remained_count.innerHTML = "2";
 		}
@@ -568,15 +555,15 @@ function getSetModal(name, price) {
 
 	close_set_btn.onclick = function () {
 		modal_set.style.display = "none";
-		dessert_info = [];
-		drink_info = [];
+		dessert_info = {};
+		drink_info = {};
 	};
 
 	window.onclick = function (event) {
 		if (event.target == modal_set) {
 			modal_set.style.display = "none";
-			dessert_info = [];
-			drink_info = [];
+			dessert_info = {};
+			drink_info = {};
 		}
 	};
 }
@@ -678,7 +665,7 @@ function displayAllergyNutrient(allergy_info, nutrients) {
 }
 
 // 모달
-function getModal(name, price) {
+function getModal(menu_id, name, price) {
 	// Get the modal
 	var modal = document.getElementById("myModal");
 	var close_btn = document.getElementsByClassName("modal_close")[0];
@@ -702,12 +689,16 @@ function getModal(name, price) {
 	// 단품/세트 버튼 클릭 시
 	only_btn.onclick = function () {
 		modal.style.display = "none";
-		addToCart(name, price);
+		addToCart(menu_id, name, price);
 	};
 	set_btn.onclick = function () {
 		name = name + "(세트)";
 		modal.style.display = "none";
-		getSetModal(name, set_price);
+		set_main.menu_id = menu_id;
+		set_main.name = name;
+		set_main.price = price;
+		// addToCart(menu_id, name, price, true);
+		getSetModal(menu_id, name, set_price);
 	};
 
 	// When the user clicks on <span> (x), close the modal
@@ -728,7 +719,7 @@ function getModal(name, price) {
 function getValueFromBtn(menu) {
 	menu.addEventListener("click", function (event) {
 		const div_inside_menu = menu.querySelector("div");
-		const price = div_inside_menu.querySelector(".menu_price").innerHTML;
+		const price = parseInt(div_inside_menu.querySelector(".menu_price").innerHTML);
 		const name = div_inside_menu.querySelector(".menu_name").innerHTML;
 		const img = menu.querySelector("img");
 		const menu_id = menu.getAttribute("data-id");
@@ -736,10 +727,10 @@ function getValueFromBtn(menu) {
 
 		// 햄버거 메뉴만 클릭했을  모달 창이 뜨도록
 		if (menu.dataset.type === "hamburger") {
-			getModal(name, price);
+			getModal(menu_id, name, price);
 			menuShowdata(name, img, menu_id);
 		} else {
-			addToCart(name, price, menu_id);
+			addToCart(menu_id, name, price);
 			menuShowdata(name, img, menu_id);
 		}
 	});

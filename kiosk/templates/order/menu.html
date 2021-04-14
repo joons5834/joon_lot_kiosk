@@ -181,7 +181,7 @@
 					</div>
 					<div class="modal_menu_set">
 						{% for set_dessert in set_desserts %}
-						<button class="menu_set" data-type="set_dessert">
+						<button class="menu_set" data-type="set_dessert" data-id="{{ set_dessert['id'] }}">
 							<img
 								src="{{ set_dessert['image_path'] }}"
 								alt=""
@@ -197,7 +197,7 @@
 
 						<!-- set_drink -->
 						{% for set_drink in set_drinks %}
-						<button class="menu_set" data-type="set_drink">
+						<button class="menu_set" data-type="set_drink" data-id="{{ set_drink['id'] }}">
 							<img
 								src="{{ set_drink['image_path'] }}"
 								alt=""

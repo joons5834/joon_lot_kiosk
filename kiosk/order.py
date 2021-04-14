@@ -146,22 +146,23 @@ def register():
     # 형태 변환 전 1차 가공: ORDER_ITEM 테이블 구조에 맞는 형태로 입력을 변환한다.
     for item in items:
         print('name:', item['name'])
-        main_id = fetch_menu_id(item['name'])  # MAIN_DISH_ID를 구한다
+        main_id = item['menu_id']  # MAIN_DISH_ID를 구한다
         main_dish_total = item['price']
         item['options'] = []
         if item['id'] == 'set':
             options = []
-            dessert_id = fetch_menu_id(item['dessert'][0])
-            drink_id = fetch_menu_id(item['drink'][0])
-            options.append((dessert_id, 1, item['dessert'][1])) 
-            options.append((drink_id, 1, item['drink'][1]))
+            dessert_id = item['dessert']['id']
+            drink_id = item['drink']['id']
+            options.append((dessert_id, 1, item['dessert']['price'])) 
+            options.append((drink_id, 1, item['drink']['price']))
             item['options'] += options
-            opt_total = item['dessert'][1] + item['drink'][1]
+            opt_total = item['dessert']['price'] + item['drink']['price']
             print('options:', options)
         raw_list.append((order_id, main_id, item['amount'], main_dish_total, item['options']))
     print('raw_list:', raw_list)
     
     # 2차 가공: 같은 MAIN_DISH끼리 묶어 QTY, OPTIONS를 합치고 item_no를 부여한다.
+    # TODO: Is it Needed?
     i = 1
     insert_opt_list = []
     raw_list = sorted(raw_list, key=lambda x: x[1])
@@ -208,17 +209,12 @@ def register():
         SET STOCK = STOCK - CONSUMPTION.AMT * ?
         FROM (SELECT INGRD_ID, AMT FROM INGRD_USE WHERE MENU_ID = ?) AS CONSUMPTION
         WHERE INGREDIENT.ID = CONSUMPTION.INGRD_ID;
-        ''' # TODO: user-friendly soldout message
+        '''
     db.executemany(ingredients_consumption, qty_list)
 
     db.commit()
     socketio.emit('order complete', order_id)
     return render_template('order/order_num.html', order_id=order_id)
-    
-
-def fetch_menu_id(name):
-    db = get_db()
-    return db.execute('SELECT ID FROM MENU WHERE NAME=?', (name,)).fetchone()[0]
 
 
 @bp.route('/wait_panel')

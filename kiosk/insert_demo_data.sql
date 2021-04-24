@@ -393,6 +393,4 @@ INSERT INTO "MENU" VALUES (100,'토핑-L치즈','https://via.placeholder.com/150
 INSERT INTO "MENU" VALUES (101,'토핑-베이컨','https://via.placeholder.com/150',500,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO "MENU" VALUES (102,'토핑-토마토','https://via.placeholder.com/150',300,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 
-INSERT INTO "MANAGER" VALUES (1, 'admin', '1234', '홍길동', '매니저'); 
-
 COMMIT;

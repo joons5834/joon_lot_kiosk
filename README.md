@@ -1,5 +1,9 @@
 # lot_kiosk
+웹앱으로 패스트푸드점의 무인 키오스크를 구현하는 프로젝트로,
+[웹앱 키오스크 만들기 프로젝트](https://github.com/joons5834/lot_kiosk)의 fork입니다.
+
 [여기](https://flask.palletsprojects.com/en/1.1.x/tutorial/layout/)에 나오는 리포지토리 구조를 모방하여 생성하였습니다.
+
 ## 프로젝트 시작하기
 1. `Flask`를 [설치](https://flask.palletsprojects.com/en/1.1.x/installation/#installation)하신 후 
 1. 프로젝트의 루트 디렉토리에서

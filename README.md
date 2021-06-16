@@ -16,7 +16,14 @@
  * 판매관리모듈
    * 매출현황, 결제 이력 확인이 가능한 페이지입니다.
 
-[//]: # (TODO: 사용 기술항목 작성하기)
+## 사용 기술
+* `Flask`
+* Vanilla JS
+* `Socket.IO`
+  * 주문 완료시 주방에 주문 내역 실시간 알림
+  * 조리 완료시 홀에 실시간 알림
+
+[//]: # (todo: 1. research local deployment options 2. write getting started for users)
 
 ## 프로젝트 시작하기
 1. `Flask`를 [설치](https://flask.palletsprojects.com/en/1.1.x/installation/#installation)하신 후 

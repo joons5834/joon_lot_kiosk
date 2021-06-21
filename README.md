@@ -23,7 +23,22 @@
   * 주문 완료시 주방에 주문 내역 실시간 알림
   * 조리 완료시 홀에 실시간 알림
 
-[//]: # (todo: 1. research local deployment options 2. write getting started for users)
+[//]: # (todo: write getting started for users)
+
+## 키오스크 서버 설치하기 
+### 요구 사항
+1. 키오스크 서버 전용 파이썬 가상환경
+   * `venv` 등을 이용해 구성
+1. `sqlite3` 버전 `3.33.0` 이상
+1. `pip` `9.0.0` 이상
+
+### 서버 설치 요령
+1. 요구 사항에 맞게 환경 구성
+1. .whl 파일 [다운로드](https://www.mediafire.com/file/lmornoboce6rzzx/kiosk-1.0.0-py3-none-any.whl/file)
+1. 전용 가상환경을 구동
+1. `pip install 다운로드받은.whl파일경로`
+
+[//]: # (todo: write getting started for users)
 
 ## 프로젝트 시작하기
 1. `Flask`를 [설치](https://flask.palletsprojects.com/en/1.1.x/installation/#installation)하신 후 

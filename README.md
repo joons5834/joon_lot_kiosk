@@ -53,6 +53,7 @@
         ```python
         SECRET_KEY = b'_2#y2L"F2Q7z\n\xec]/' # Do not copy and paste this as-is! Use your own key!
         ```
+    * 설정된 랜덤 키가 유출되지 않도록 주의합니다.
 1. 두 링크를 참고하여 선호하는 방식으로 배포합니다. 메인 모듈이름은 `kiosk`, application factory 이름은 `create_app`입니다.
     * [`Waitress`를 이용한 배포](https://flask.palletsprojects.com/en/2.0.x/tutorial/deploy/#run-with-a-production-server)
         * `$ waitress-serve --call 'kiosk:create_app'`

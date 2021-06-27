@@ -58,6 +58,9 @@
         * `$ waitress-serve --call 'kiosk:create_app'`
     * [self-hosted options](https://flask.palletsprojects.com/en/2.0.x/deploying/#self-hosted-options)
 
-[//]: # (todo: write getting started for users)
-
+## 모듈 주소
+* 고객주문모듈 - `<server-address>/order/`
+* 주문관리모듈 - `<server-address>/manage_order/orders/`
+* 메뉴관리모듈 - `<server-address>/manage_menu/`
+* 판매관리모듈 - `<server-address>/manage_sale/`
 

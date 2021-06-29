@@ -41,14 +41,14 @@
         export FLASK_APP=kiosk
         flask init-db
          ```
-    * `venv`를 통해 가상환경을 생성한 경우 `path_to_venv/var/kiosk-instance`에 `kiosk.sqlite`이 생성된 것을 확인합니다.
+    * `venv`를 통해 가상환경을 생성한 경우 `<path-to-venv>/var/kiosk-instance`에 `kiosk.sqlite`이 생성된 것을 확인합니다.
 1. `SECRET_KEY` 구성
     1. 랜덤 시크릿 키 생성
         ``` bash
         $ python -c 'import os; print(os.urandom(16))'
         b'_2#y2L"F2Q7z\n\xec]/'
         ```
-    1. `venv`를 통해 가상환경을 생성한 경우 `venv/var/kiosk-instance/config.py` 파일을 생성하고 ***각자 생성한*** 랜덤 키를 추가
+    1. `venv`를 통해 가상환경을 생성한 경우 `<path-to-venv>/var/kiosk-instance/config.py` 파일을 생성하고 ***각자 생성한*** 랜덤 키를 추가
         ```python
         SECRET_KEY = b'_2#y2L"F2Q7z\n\xec]/' # Do not copy and paste this as-is! Use your own key!
         ```

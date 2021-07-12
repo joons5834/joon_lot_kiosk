@@ -1,3 +1,11 @@
+## 프로젝트 구조
+[여기](https://flask.palletsprojects.com/en/1.1.x/tutorial/layout/)에 나오는 리포지토리 구조를 참고하여 생성하였습니다.
+* `instance/` : DB, 인스턴스 설정 값 등 서버 인스턴스의 정보 디렉터리
+* `tests/` : 테스트 구성 파일 및 테스트 모듈 디렉터리
+* `kiosk/` : 웹 앱 코드와 파일 디렉터리
+    * `kiosk/templates` :  `jinja2` 템플릿(`.html`) 디렉터리
+    * `kiosk/static` : `.css`, `.js`, 이미지 등 정적 리소스 디렉터리
+
 ## 프로젝트 시작하기
 1. `Flask`를 [설치](https://flask.palletsprojects.com/en/1.1.x/installation/#installation)하신 후 
 1. 프로젝트의 루트 디렉토리에서

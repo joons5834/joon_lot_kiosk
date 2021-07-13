@@ -4,7 +4,12 @@
 * `tests/` : 테스트 구성 파일 및 테스트 모듈 디렉터리
 * `kiosk/` : 웹 앱 코드와 파일 디렉터리
     * `kiosk/templates` :  `jinja2` 템플릿(`.html`) 디렉터리
-    * `kiosk/static` : `.css`, `.js`, 이미지 등 정적 리소스 디렉터리
+      * `kiosk/templates/auth` : 로그인 인증 모듈 관련 템플릿
+      * `kiosk/templates/order` : 고객 주문 모듈 관련 템플릿
+      * `kiosk/templates/manage_menu` : 메뉴 변동 관리 모듈 관련 템플릿
+      * `kiosk/templates/manage_order` : 주방 주문관리 모듈 관련 템플릿 
+      * `kiosk/templates/manage_sale` : 판매 관리 모듈 관련 템플릿
+    * `kiosk/static` : `.css`, `.js`, 이미지 파일 등 정적 리소스 디렉터리
 
 ## 프로젝트 시작하기
 1. `Flask`를 [설치](https://flask.palletsprojects.com/en/1.1.x/installation/#installation)하신 후 

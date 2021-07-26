@@ -4,6 +4,7 @@ function insertAtTop(list, value){
     li.setAttribute("id", value);
     list.prepend(li);
 }
+const LIST_MAX_LEN = 10
 const socket = io();
 socket.on( 'order complete', function( order_id ) {
         console.log( order_id );
@@ -22,5 +23,8 @@ if (cooking)
 else{
  insertAtTop(ul, order_id)
 }
-ul.removeChild(ul.lastChild)
+if (ul.length == LIST_MAX_LEN){
+    ul.removeChild(ul.lastChild)
+}
+
 })

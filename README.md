@@ -65,6 +65,10 @@
 * 메뉴관리모듈 - `<server-address>/manage_menu/`
 * 판매관리모듈 - `<server-address>/manage_sale/`
 
+## 고객주문모듈
+### 키오스크 주문
+<a href="https://imgbb.com/"><img src="https://i.ibb.co/f86Q60L/kiosk-order.gif" alt="kiosk-order" border="0" height=300px></a>
+
 ## 주문관리모듈
 ### 조리완료처리
 1. `<server-ip>/manage_order/orders`에 접속합니다.

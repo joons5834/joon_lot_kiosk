@@ -64,3 +64,21 @@
 * 메뉴관리모듈 - `<server-address>/manage_menu/`
 * 판매관리모듈 - `<server-address>/manage_sale/`
 
+## 고객주문모듈
+### 키오스크 주문
+1. 고객용 키오스크에 `<server-address>/order/` 페이지를 세팅합니다.
+1. 고객이 결제수단, 메뉴 및 옵션, 포장여부, 결제수단을 선택해 주문을 완료합니다.
+1. 주문이 완료되면 주문관리모듈 및 대기 현황판에 주문이 표시됩니다.
+
+<a href="https://imgbb.com/"><img src="https://i.ibb.co/f86Q60L/kiosk-order.gif" alt="kiosk-order" border="0" height=300px></a>
+
+## 주문관리모듈
+### 조리완료처리
+1. `<server-ip>/manage_order/orders`에 접속합니다.
+1. 관리자 로그인을 합니다
+    1. 관리자 계정이 없을 경우 `계정 등록`을 눌러 관리자 등록 후 로그인 합니다.
+1. 주문 현황판에서 조리가 완료되어 서빙할 주문의 우상단 `호출`버튼을 누릅니다.
+1. 해당 주문은 현황판에서 사라지고 해당 주문 번호는 고객용 대기 현황판의 `조리 완료` 섹션에 표시됩니다.
+
+<a href="https://ibb.co/tKdTndv"><img src="https://i.ibb.co/W5T47TM/order-complete.gif" alt="order-complete" border="0" height=400px></a>
+

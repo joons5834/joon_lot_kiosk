@@ -67,6 +67,10 @@
 
 ## 고객주문모듈
 ### 키오스크 주문
+1. 고객용 키오스크에 `<server-address>/order/` 페이지를 세팅합니다.
+1. 고객이 결제수단, 메뉴 및 옵션, 포장여부, 결제수단을 선택해 주문을 완료합니다.
+1. 주문이 완료되면 주문관리모듈 및 대기 현황판에 주문이 표시됩니다.
+
 <a href="https://imgbb.com/"><img src="https://i.ibb.co/f86Q60L/kiosk-order.gif" alt="kiosk-order" border="0" height=300px></a>
 
 ## 주문관리모듈
